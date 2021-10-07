@@ -1,0 +1,10 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/sat_webservice
+    username: sat_user
+    password: sat_pass
+    driver-class-name: "com.mysql.jdbc.Driver"

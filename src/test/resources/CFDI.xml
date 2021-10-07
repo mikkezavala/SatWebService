@@ -1,0 +1,15 @@
+<cfdi:Comprobante xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.sat.gob.mx/Pagos http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos10.xsd" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="3.3" Serie="SER" Folio="00001" Fecha="2021-09-27T09:49:15" Sello="SELLO" NoCertificado="0000" Certificado="CERT" SubTotal="0" Moneda="XXX" Total="0" TipoDeComprobante="P" LugarExpedicion="97128" xmlns:pago10="http://www.sat.gob.mx/Pagos">
+  <cfdi:Emisor Rfc="COMPANYRFC" Nombre="Radiomóvil Dipsa, S.A. de C.V." RegimenFiscal="601"/>
+  <cfdi:Receptor Rfc="CUSTRFC" Nombre="CUSTOMER NAME" UsoCFDI="P01"/>
+  <cfdi:Conceptos>
+    <cfdi:Concepto ClaveProdServ="84111506" Cantidad="1" ClaveUnidad="ACT" Descripcion="Pago" ValorUnitario="0" Importe="0"/>
+  </cfdi:Conceptos>
+  <cfdi:Complemento>
+    <pago10:Pagos Version="1.0">
+      <pago10:Pago FechaPago="2021-09-25T12:00:00" FormaDePagoP="04" MonedaP="MXN" Monto="599.00">
+        <pago10:DoctoRelacionado IdDocumento="ID_DOC" Serie="HC" Folio="000000000083942988" MonedaDR="MXN" MetodoDePagoDR="PPD" NumParcialidad="1" ImpSaldoAnt="599.00" ImpPagado="599.00" ImpSaldoInsoluto="0.00"/>
+      </pago10:Pago>
+    </pago10:Pagos>
+    <tfd:TimbreFiscalDigital xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" Version="1.1" UUID="FAKE_UUID" FechaTimbrado="2021-09-27T09:52:56" RfcProvCertif="PRO170621R87" SelloCFD="SELLOCFD" NoCertificadoSAT="0000001" SelloSAT="SELLOSAT"/>
+  </cfdi:Complemento>
+</cfdi:Comprobante>
