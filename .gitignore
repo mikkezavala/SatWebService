@@ -1,0 +1,8 @@
+.idea
+**/**/resources/*.pfx
+.*githookrcgit
+soap
+*.zip
+target
+**/.DS_Store
+mysql-data

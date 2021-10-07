@@ -4,96 +4,104 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.mikkezavala.declarame</groupId>
-  <artifactId>DeclaraME</artifactId>
+  <groupId>com.mikkezavala.sat</groupId>
+  <artifactId>SatWebService</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.1.7.RELEASE</version>
+    <version>2.5.5</version>
   </parent>
 
   <properties>
-    <jwt.version>1.0.10.RELEASE</jwt.version>
-    <commons-io.version>2.6</commons-io.version>
     <maven.javadoc.skip>true</maven.javadoc.skip>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <oauth.version>${project.parent.version}</oauth.version>
+
+    <!-- deps versions -->
+    <lombok.version>1.18.20</lombok.version>
+    <commons.io.version>2.11.0</commons.io.version>
+
   </properties>
 
   <scm>
-    <connection>scm:git:https://github.com/mikkezavala/decalara-me.git</connection>
-    <url>https://github.com/mikkezavala/decalara-me</url>
+    <connection>scm:git:https://github.com/mikkezavala/SatWebService.git</connection>
+    <url>https://github.com/mikkezavala/SatWebService.git</url>
     <tag>HEAD</tag>
   </scm>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
+      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.14</version>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons.io.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web-services</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.10</version>
+      <version>${lombok.version}</version>
       <scope>provided</scope>
     </dependency>
-    
+
+    <!-- Data-->
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>${commons-io.version}</version>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!-- Test Deps -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- JAXB Stuffies -->
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+      <version>2.3.0-b170201.1204</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/javax.activation/activation -->
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>activation</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>2.3.0-b170127.1453</version>
     </dependency>
   </dependencies>
 
-  <profiles>
-    <profile>
-      <id>java11</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-
-      <dependencies>
-        <dependency>
-          <groupId>org.glassfish.jaxb</groupId>
-          <artifactId>jaxb-runtime</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
-
   <build>
-    <finalName>declara-me</finalName>
+    <finalName>sat-web-service</finalName>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
-      <!-- tag::wsdl[] -->
     </plugins>
   </build>
 </project>
