@@ -1,5 +1,8 @@
 package com.mikkezavala.sat.domain.sat.cfdi.entity;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -27,9 +30,11 @@ public class Concepto {
   @XmlAttribute(name = "Importe")
   private double importAmount;
 
+  @JsonInclude(NON_NULL)
   @XmlAttribute(name = "NoIdentificacion")
   private String idNumber;
 
+  @JsonInclude(NON_NULL)
   @XmlAttribute(name = "Unidad")
   private String unit;
 
