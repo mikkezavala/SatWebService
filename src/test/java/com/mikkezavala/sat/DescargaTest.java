@@ -31,7 +31,7 @@ public class DescargaTest {
         .unmarshal(doc, Invoice.class);
 
     Invoice resolved = body.getValue();
-    assertThat(resolved.getCompliment().getPayments().getPayment().getAmount()).isEqualTo(599.0);
+    assertThat(resolved.getComplement().getPayments().getPayment().getAmount()).isEqualTo(599.0);
   }
 
   @Test
@@ -48,7 +48,24 @@ public class DescargaTest {
         .unmarshal(doc, Invoice.class);
 
     Invoice resolved = body.getValue();
-    assertThat(resolved.getCompliment().getPayroll().getTotalDeductions()).isEqualTo(24860.95);
+    assertThat(resolved.getComplement().getPayroll().getTotalDeductions()).isEqualTo(24860.95);
+  }
+
+  @Test
+  public void shouldParseConcepts() throws Exception {
+
+    File inpt = loadResource("CFDI-CONCEPTS.xml");
+    FileInputStream fos = new FileInputStream(inpt);
+
+    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    Document doc = builder.parse(fos);
+
+    JAXBContext context = JAXBContext.newInstance(Invoice.class);
+    JAXBElement<Invoice> body = context.createUnmarshaller()
+        .unmarshal(doc, Invoice.class);
+
+    Invoice resolved = body.getValue();
+    assertThat(resolved.getComplement().getPayroll().getTotalDeductions()).isEqualTo(24860.95);
   }
 
   public File loadResource(String file) throws FileNotFoundException {

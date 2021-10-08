@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Nomina {
+public class Payroll {
 
   @XmlAttribute(name = "TotalDeducciones")
   private double totalDeductions;
