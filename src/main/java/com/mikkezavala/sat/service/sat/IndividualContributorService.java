@@ -129,6 +129,7 @@ public class IndividualContributorService {
           .message(result.getMessage())
           .dateEnd(request.getDateEnd())
           .dateStart(request.getDateStart())
+          .timesRequested(1)
           .requestId(requestId).path("").build()
       );
 
@@ -155,8 +156,9 @@ public class IndividualContributorService {
       ValidateResult result = response.getResult();
       return satPacketRepository.save(packet.toBuilder()
           .status(result.getStatus())
+          .message(result.getMessage())
           .state(result.getState().name())
-          .message(result.getMessage()).build()
+          .timesRequested(packet.getTimesRequested() + 1).build()
       );
     } catch (Exception e) {
       LOGGER.error("failed validating request", e);

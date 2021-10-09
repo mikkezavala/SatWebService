@@ -105,9 +105,8 @@ public class SoapService {
         SOAPMessage message = soapHandler.createEnvelope();
         RequestDownload requestDownload = new RequestDownload();
 
-        String endDate = FORMATTER.format(ZonedDateTime.now().toInstant().atZone(ZoneId.of("UTC")));
-        String startDate = FORMATTER
-            .format(ZonedDateTime.now().minusMonths(2).toInstant().atZone(ZoneId.of("UTC")));
+        String endDate = FORMATTER.format(dateEnd);
+        String startDate = FORMATTER.format(dateStart);
 
         request.setFechaFinal(endDate);
         request.setTipoSolicitud("CFDI");

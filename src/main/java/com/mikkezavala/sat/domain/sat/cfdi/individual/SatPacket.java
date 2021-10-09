@@ -41,4 +41,6 @@ public class SatPacket {
 
   private ZonedDateTime dateStart;
 
+  private Integer timesRequested;
+
 }
