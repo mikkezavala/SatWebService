@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Invoice;
 import java.io.File;
 import java.io.FileInputStream;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.parsers.DocumentBuilder;

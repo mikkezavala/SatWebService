@@ -25,13 +25,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class IndividualContributorService {
 
-  private final SoapService service;
-
-  private final SatTokenRepository repository;
-
-  private final SatPacketRepository satPacketRepository;
-
   private static final Logger LOGGER = LoggerFactory.getLogger(IndividualContributorService.class);
+  private final SoapService service;
+  private final SatTokenRepository repository;
+  private final SatPacketRepository satPacketRepository;
 
   public IndividualContributorService(
       SoapService service, SatTokenRepository repository, SatPacketRepository satPacketRepository

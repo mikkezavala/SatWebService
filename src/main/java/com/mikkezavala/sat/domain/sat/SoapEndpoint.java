@@ -14,8 +14,8 @@ public enum SoapEndpoint {
       "https://cfdidescargamasiva.clouda.sat.gob.mx/DescargaMasivaService.svc"
   );
 
-  private String action;
-  private String url;
+  private final String action;
+  private final String url;
 
   SoapEndpoint(String action, String url) {
     this.url = url;

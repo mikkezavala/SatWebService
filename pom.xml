@@ -16,8 +16,8 @@
 
   <properties>
     <maven.javadoc.skip>true</maven.javadoc.skip>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
 
     <!-- deps versions -->
     <lombok.version>1.18.20</lombok.version>
@@ -84,27 +84,35 @@
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
-      <version>2.3.0-b170201.1204</version>
+      <version>2.4.0-b180830.0359</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/javax.activation/activation -->
     <dependency>
       <groupId>javax.activation</groupId>
       <artifactId>activation</artifactId>
-      <version>1.1</version>
+      <version>1.1.1</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime -->
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
-      <version>2.3.0-b170127.1453</version>
+      <version>2.3.1</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 
   <build>
     <finalName>sat-web-service</finalName>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

@@ -40,11 +40,9 @@ import org.w3c.dom.Document;
 @RequestMapping(path = "/v1")
 public class CFDIDownloadController {
 
-  private final SoapService service;
-
   private static final String ZIP_PREFIX = "./zip/";
-
   private static final Logger LOGGER = LoggerFactory.getLogger(CFDIDownloadController.class);
+  private final SoapService service;
 
   public CFDIDownloadController(SoapService service) {
     this.service = service;

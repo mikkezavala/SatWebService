@@ -1,6 +1,5 @@
 package com.mikkezavala.sat.domain.sat.cfdi.individual;
 
-import com.mikkezavala.sat.domain.sat.cfdi.individual.validate.StateCode;
 import java.time.ZonedDateTime;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

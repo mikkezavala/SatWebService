@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/v1/persona-fisica")
 public class IndividualContributorController {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+      IndividualContributorController.class);
   private final IndividualContributorService service;
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(IndividualContributorController.class);
 
   public IndividualContributorController(IndividualContributorService service) {
     this.service = service;

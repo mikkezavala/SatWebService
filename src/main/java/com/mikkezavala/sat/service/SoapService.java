@@ -8,8 +8,8 @@ import static com.mikkezavala.sat.util.XmlUtil.WSS_UTILITY_NS;
 import static javax.xml.crypto.dsig.CanonicalizationMethod.EXCLUSIVE;
 import static javax.xml.crypto.dsig.SignatureMethod.RSA_SHA1;
 
-import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
 import com.mikkezavala.sat.domain.sat.auth.Auth;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.download.Download;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.download.DownloadRequest;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.request.Request;
@@ -56,31 +56,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class SoapService {
 
-    private final SoapHandler soapHandler;
-
-    private final SatClientRepository repository;
-
-    private final static int EXPIRES = 50000;
-
-    private final static String ENV_PREFIX = "s";
-
-    private final static String DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
-
-    private final static XMLSignatureFactory SIGN_FACTORY = XMLSignatureFactory.getInstance("DOM");
-
-    private final static DateTimeFormatter FORMATTER = DateTimeFormatter
-        .ofPattern(DATE_TIME_PATTERN);
+  private final static int EXPIRES = 50000;
+  private final static String ENV_PREFIX = "s";
+  private final static String DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
+  private final static XMLSignatureFactory SIGN_FACTORY = XMLSignatureFactory.getInstance("DOM");
+  private final static DateTimeFormatter FORMATTER = DateTimeFormatter
+      .ofPattern(DATE_TIME_PATTERN);
+  private final SoapHandler soapHandler;
+  private final SatClientRepository repository;
 
 
-    public SoapService(SoapHandler soapHandler, SatClientRepository repository) {
-        this.soapHandler = soapHandler;
-        this.repository = repository;
-    }
+  public SoapService(SoapHandler soapHandler, SatClientRepository repository) {
+    this.soapHandler = soapHandler;
+    this.repository = repository;
+  }
 
-    public SOAPMessage autentica(String rfc) throws Exception {
-        SOAPMessage message = soapHandler.createEnvelope();
+  public SOAPMessage autentica(String rfc) throws Exception {
+    SOAPMessage message = soapHandler.createEnvelope();
 
-        SOAPBody body = message.getSOAPBody();
+    SOAPBody body = message.getSOAPBody();
         SOAPHeader header = message.getSOAPHeader();
         SOAPElement timestamp = createTimestampElement();
         SOAPElement security = createSecurityElement(header, rfc);
