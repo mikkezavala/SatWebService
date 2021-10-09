@@ -1,15 +1,14 @@
 package com.mikkezavala.sat.controller;
 
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.AUTENTICA;
-import static com.mikkezavala.sat.domain.sat.SoapEndpoint.SOLICITA_DESCARGA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.VALIDA_DESCARGA;
 
 import com.mikkezavala.sat.domain.sat.SoapEndpoint;
 import com.mikkezavala.sat.domain.sat.auth.AuthResponse;
-import com.mikkezavala.sat.domain.sat.cfdi.download.DownloadResponse;
-import com.mikkezavala.sat.domain.sat.cfdi.entity.Invoice;
-import com.mikkezavala.sat.domain.sat.cfdi.request.Response;
-import com.mikkezavala.sat.domain.sat.cfdi.validate.ValidateResponse;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.download.DownloadResponse;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Invoice;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.request.Response;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.validate.ValidateResponse;
 import com.mikkezavala.sat.service.SoapService;
 import com.mikkezavala.sat.util.SoapUtil;
 import java.io.File;
@@ -70,12 +69,12 @@ public class CFDIDownloadController {
       @RequestHeader("Authorization") String token
   ) {
 
-    try {
-      return SoapUtil.callWebService(service.solicita(body.get("rfc")), Response.class,
-          SOLICITA_DESCARGA, token);
-    } catch (Exception e) {
-      LOGGER.error("failed creatinf request");
-    }
+//    try {
+//      return SoapUtil.callWebService(service.solicita(body.get("rfc")), Response.class,
+//          SOLICITA_DESCARGA, token);
+//    } catch (Exception e) {
+//      LOGGER.error("failed creatinf request");
+//    }
 
     return null;
   }

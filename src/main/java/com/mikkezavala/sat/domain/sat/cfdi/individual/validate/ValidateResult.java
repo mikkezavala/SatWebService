@@ -1,4 +1,4 @@
-package com.mikkezavala.sat.domain.sat.cfdi.validate;
+package com.mikkezavala.sat.domain.sat.cfdi.individual.validate;
 
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,9 +14,8 @@ public class ValidateResult {
   @XmlAttribute(name = "CodEstatus")
   private String status;
 
-
   @XmlAttribute(name = "EstadoSolicitud")
-  private int state;
+  private StateCode state;
 
   @XmlAttribute(name = "Mensaje")
   private String message;
