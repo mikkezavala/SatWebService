@@ -1,18 +1,23 @@
 package com.mikkezavala.sat.util;
 
 import com.mikkezavala.sat.domain.sat.SoapEndpoint;
+import com.mikkezavala.sat.domain.sat.auth.AuthResponse;
+import com.mikkezavala.sat.domain.sat.auth.Timestamp;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.UUID;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeaders;
+import javax.xml.soap.Node;
 import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPConnectionFactory;
 import javax.xml.soap.SOAPElement;
@@ -68,7 +73,12 @@ public class SoapUtil {
         Document doc = resp.getSOAPBody().extractContentAsDocument();
         JAXBElement<T> body = context.createUnmarshaller().unmarshal(doc, clazz);
 
-        return body.getValue();
+        T returnValue = body.getValue();
+        if (endpoint.equals(SoapEndpoint.AUTENTICA) && returnValue instanceof AuthResponse) {
+            ((AuthResponse) returnValue).setTimestamp(createTimestamp(resp.getSOAPHeader()));
+        }
+
+        return returnValue;
     }
 
     public static SOAPElement getFirstNode(SOAPElement body) {
@@ -101,8 +111,45 @@ public class SoapUtil {
     private static <T> String getFilePrefix(Class<T> clazz) {
         String[] parts = clazz.getName().split("\\.");
         String group = parts.length >= 3 ? parts[parts.length - 3] : "unknown";
-        
+
         return (group + "-" + parts[parts.length - 2]).toLowerCase();
+    }
+
+    private static Timestamp createTimestamp(SOAPElement header) {
+        String created = null;
+        String expires = null;
+
+        SOAPElement authHeader = getFirstNode(
+            Objects.requireNonNull(
+                getFirstNode(header)
+            )
+        );
+
+        if (Objects.nonNull(authHeader)) {
+            Iterator<Node> elements = authHeader.getChildElements();
+            while (elements.hasNext()) {
+                Node el = elements.next();
+                if (el instanceof SOAPElement) {
+                    SOAPElement soapElement = (SOAPElement) el;
+                    String name = soapElement.getElementName().getLocalName();
+                    if (name.equals("Created")) {
+                        created = el.getTextContent();
+                    } else if (name.equals("Expires")) {
+                        expires = el.getTextContent();
+                    }
+                }
+            }
+        }
+
+        if (Objects.nonNull(created) && Objects.nonNull(expires)) {
+            Timestamp ts = new Timestamp();
+            ts.setCreated(ZonedDateTime.parse(created));
+            ts.setExpires(ZonedDateTime.parse(expires));
+
+            return ts;
+        }
+
+        return null;
     }
 
 }

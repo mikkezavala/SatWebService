@@ -1,4 +1,4 @@
-package com.mikkezavala.sat.domain.sat.cfdi.download;
+package com.mikkezavala.sat.domain.sat.cfdi.individual.download;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

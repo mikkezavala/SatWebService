@@ -1,6 +1,5 @@
-package com.mikkezavala.sat.domain.sat.cfdi.validate;
+package com.mikkezavala.sat.domain.sat.cfdi.individual.request;
 
-import com.mikkezavala.sat.domain.sat.cfdi.request.Request;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -9,9 +8,10 @@ import lombok.Data;
 
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "VerificaSolicitudDescarga", namespace = "http://DescargaMasivaTerceros.sat.gob.mx")
-public class ValidateDownload {
+@XmlRootElement(name = "SolicitaDescarga", namespace = "http://DescargaMasivaTerceros.sat.gob.mx")
+public class RequestDownload {
 
   @XmlElement(name = "solicitud", namespace = "http://DescargaMasivaTerceros.sat.gob.mx")
   private Request request;
+
 }

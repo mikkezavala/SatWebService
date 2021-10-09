@@ -1,4 +1,4 @@
-package com.mikkezavala.sat.domain.sat.cfdi.entity;
+package com.mikkezavala.sat.domain.sat.cfdi.individual.entity;
 
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;

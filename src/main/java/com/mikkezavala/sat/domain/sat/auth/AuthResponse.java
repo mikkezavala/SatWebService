@@ -12,11 +12,7 @@ import lombok.Data;
 public class AuthResponse {
 
   @XmlElement(name = "AutenticaResult", namespace = "http://DescargaMasivaTerceros.gob.mx")
-  private String autenticaResult;
+  private String token;
 
-  @Override
-  public String toString() {
-    return "Token: " + autenticaResult;
-  }
-
+  private Timestamp timestamp;
 }

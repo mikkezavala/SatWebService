@@ -1,4 +1,4 @@
-package com.mikkezavala.sat.domain;
+package com.mikkezavala.sat.domain.sat.cfdi.individual;
 
 
 import javax.persistence.Entity;

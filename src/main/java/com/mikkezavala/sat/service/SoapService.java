@@ -8,13 +8,13 @@ import static com.mikkezavala.sat.util.XmlUtil.WSS_UTILITY_NS;
 import static javax.xml.crypto.dsig.CanonicalizationMethod.EXCLUSIVE;
 import static javax.xml.crypto.dsig.SignatureMethod.RSA_SHA1;
 
-import com.mikkezavala.sat.domain.SatClient;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
 import com.mikkezavala.sat.domain.sat.auth.Auth;
-import com.mikkezavala.sat.domain.sat.cfdi.download.Download;
-import com.mikkezavala.sat.domain.sat.cfdi.download.DownloadRequest;
-import com.mikkezavala.sat.domain.sat.cfdi.request.Request;
-import com.mikkezavala.sat.domain.sat.cfdi.request.RequestDownload;
-import com.mikkezavala.sat.domain.sat.cfdi.validate.ValidateDownload;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.download.Download;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.download.DownloadRequest;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.request.Request;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.request.RequestDownload;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.validate.ValidateDownload;
 import com.mikkezavala.sat.repository.SatClientRepository;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -98,7 +98,9 @@ public class SoapService {
         return message;
     }
 
-    public SOAPMessage solicita(String rfc) throws Exception {
+    public SOAPMessage solicita(
+        String rfc, ZonedDateTime dateStart, ZonedDateTime dateEnd
+    ) throws Exception {
         Request request = new Request();
         SOAPMessage message = soapHandler.createEnvelope();
         RequestDownload requestDownload = new RequestDownload();

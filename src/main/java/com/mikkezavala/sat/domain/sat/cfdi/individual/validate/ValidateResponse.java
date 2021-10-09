@@ -1,4 +1,4 @@
-package com.mikkezavala.sat.domain.sat.cfdi.validate;
+package com.mikkezavala.sat.domain.sat.cfdi.individual.validate;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

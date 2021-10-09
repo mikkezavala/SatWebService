@@ -1,4 +1,4 @@
-package com.mikkezavala.sat.domain.sat.cfdi.entity;
+package com.mikkezavala.sat.domain.sat.cfdi.individual.entity;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
