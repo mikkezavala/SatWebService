@@ -1,6 +1,9 @@
 # Servicio Web SAT
 
-### Como iniciar
+## Build Status
+[![CircleCI](https://circleci.com/gh/mikkezavala/SatWebService/tree/main.svg?style=svg)](https://circleci.com/gh/mikkezavala/SatWebService/tree/main)
+
+## Como iniciar
 - Instalar docker
 
 ## FIEL
