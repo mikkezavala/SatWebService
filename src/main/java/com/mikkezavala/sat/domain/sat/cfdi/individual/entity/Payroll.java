@@ -1,4 +1,4 @@
-package com.mikkezavala.sat.domain.sat.cfdi.entity;
+package com.mikkezavala.sat.domain.sat.cfdi.individual.entity;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Nomina {
+public class Payroll {
 
   @XmlAttribute(name = "TotalDeducciones")
   private double totalDeductions;

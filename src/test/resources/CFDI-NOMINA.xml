@@ -1,0 +1,27 @@
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:nomina12="http://www.sat.gob.mx/nomina12" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" LugarExpedicion="03100" MetodoPago="PUE" TipoDeComprobante="N" Total="43315.97" Moneda="MXN" Descuento="24860.95" SubTotal="68176.92" Certificado="SELLO==" Fecha="2021-08-27T15:15:43" Folio="283" Version="3.3" xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.sat.gob.mx/nomina12 http://www.sat.gob.mx/sitio_internet/cfd/nomina/nomina12.xsd">
+  <cfdi:Emisor RegimenFiscal="601" Nombre="COMPANY" Rfc="XXXX8003016C4" />
+  <cfdi:Receptor UsoCFDI="P01" Nombre="CLIENT" Rfc="XXXX8503016C3" />
+  <cfdi:Conceptos>
+    <cfdi:Concepto Descuento="24860.95" Importe="222222.92" ValorUnitario="222222.92" Descripcion="Pago de nómina" ClaveUnidad="ACT" Cantidad="1" ClaveProdServ="84111505" />
+  </cfdi:Conceptos>
+  <cfdi:Complemento>
+    <tfd:TimbreFiscalDigital xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" Version="1.1" UUID="UUID-0000001" FechaTimbrado="2021-08-27T15:15:45" RfcProvCertif="PROCERT" SelloCFD="SELLO==" />
+    <nomina12:Nomina TotalOtrosPagos="0" TotalDeducciones="24860.95" TotalPercepciones="68176.92" NumDiasPagados="14.000" FechaFinalPago="2021-08-22" FechaInicialPago="2021-08-09" FechaPago="2021-08-27" TipoNomina="O" Version="1.2">
+      <nomina12:Emisor RegistroPatronal="PTRONID" />
+      <nomina12:Receptor ClaveEntFed="AGU" SalarioDiarioIntegrado="2240.5" CuentaBancaria="000998765455667" PeriodicidadPago="03" RiesgoPuesto="1" Puesto="INGENIERO DE PROGRAMACION" Departamento="CORE DS RETAIL CMG" NumEmpleado="202727" TipoRegimen="02" Sindicalizado="No" TipoContrato="01" Antigüedad="P5W" FechaInicioRelLaboral="2021-07-12" NumSeguridadSocial="99999999" Curp="CURPCODE" />
+      <nomina12:Percepciones TotalExento="0" TotalGravado="68176.92" TotalSueldos="68176.92">
+        <nomina12:Percepcion ImporteExento="0" ImporteGravado="68176.92" Concepto="SUELDO" Clave="001" TipoPercepcion="001" />
+      </nomina12:Percepciones>
+      <nomina12:Deducciones TotalImpuestosRetenidos="19233.19" TotalOtrasDeducciones="5627.76">
+        <nomina12:Deduccion Importe="222222.19" Concepto="ISR A CARGO" Clave="300" TipoDeduccion="002" />
+        <nomina12:Deduccion Importe="3333.38" Concepto="DEDUCCION ESPP" Clave="222" TipoDeduccion="004" />
+        <nomina12:Deduccion Importe="3333.38" Concepto="IMSS" Clave="306" TipoDeduccion="001" />
+      </nomina12:Deducciones>
+      <nomina12:OtrosPagos>
+        <nomina12:OtroPago Importe="0" Concepto="SUBSIDIO EMPLEO" Clave="002" TipoOtroPago="002">
+          <nomina12:SubsidioAlEmpleo SubsidioCausado="0" />
+        </nomina12:OtroPago>
+      </nomina12:OtrosPagos>
+    </nomina12:Nomina>
+  </cfdi:Complemento>
+</cfdi:Comprobante>

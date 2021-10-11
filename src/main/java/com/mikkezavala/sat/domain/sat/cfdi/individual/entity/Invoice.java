@@ -1,5 +1,8 @@
-package com.mikkezavala.sat.domain.sat.cfdi.entity;
+package com.mikkezavala.sat.domain.sat.cfdi.individual.entity;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -24,7 +27,12 @@ public class Invoice {
   @XmlElement(name = "cfdi:Receptor")
   private Receptor receptor;
 
+  @JsonInclude(NON_NULL)
   @XmlElement(name = "cfdi:Complemento")
-  private Complemento compliment;
+  private Complemento complement;
+
+  @JsonInclude(NON_NULL)
+  @XmlElement(name = "cfdi:Conceptos")
+  private Conceptos concepts;
 
 }

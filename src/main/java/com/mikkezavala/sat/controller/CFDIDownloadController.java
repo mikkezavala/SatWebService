@@ -1,17 +1,17 @@
 package com.mikkezavala.sat.controller;
 
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.AUTENTICA;
-import static com.mikkezavala.sat.domain.sat.SoapEndpoint.SOLICITA_DESCARGA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.VALIDA_DESCARGA;
 
 import com.mikkezavala.sat.domain.sat.SoapEndpoint;
 import com.mikkezavala.sat.domain.sat.auth.AuthResponse;
-import com.mikkezavala.sat.domain.sat.cfdi.download.DownloadResponse;
-import com.mikkezavala.sat.domain.sat.cfdi.entity.Invoice;
-import com.mikkezavala.sat.domain.sat.cfdi.request.Response;
-import com.mikkezavala.sat.domain.sat.cfdi.validate.ValidateResponse;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.download.DownloadResponse;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Invoice;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.request.Response;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.validate.ValidateResponse;
 import com.mikkezavala.sat.service.SoapService;
 import com.mikkezavala.sat.util.SoapUtil;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -20,13 +20,13 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,9 +40,9 @@ import org.w3c.dom.Document;
 @RequestMapping(path = "/v1")
 public class CFDIDownloadController {
 
-  private final SoapService service;
-
+  private static final String ZIP_PREFIX = "./zip/";
   private static final Logger LOGGER = LoggerFactory.getLogger(CFDIDownloadController.class);
+  private final SoapService service;
 
   public CFDIDownloadController(SoapService service) {
     this.service = service;
@@ -67,12 +67,12 @@ public class CFDIDownloadController {
       @RequestHeader("Authorization") String token
   ) {
 
-    try {
-      return SoapUtil.callWebService(service.solicita(body.get("rfc")), Response.class,
-          SOLICITA_DESCARGA, token);
-    } catch (Exception e) {
-      LOGGER.error("failed creatinf request");
-    }
+//    try {
+//      return SoapUtil.callWebService(service.solicita(body.get("rfc")), Response.class,
+//          SOLICITA_DESCARGA, token);
+//    } catch (Exception e) {
+//      LOGGER.error("failed creatinf request");
+//    }
 
     return null;
   }
@@ -101,17 +101,22 @@ public class CFDIDownloadController {
       @RequestBody Map<String, String> body,
       @RequestHeader("Authorization") String token
   ) {
-    String uuid = UUID.randomUUID().toString();
+    String packedId = body.get("packetId");
     try {
       DownloadResponse salida = SoapUtil.callWebService(
-          service.descarga(body.get("packetId"), body.get("rfc")),
+          service.descarga(packedId, body.get("rfc")),
           DownloadResponse.class,
           SoapEndpoint.DESCARGA_MASIVA, token
       );
 
       byte[] bytes = Base64.getDecoder().decode(salida.getPaquete());
 
-      String zipFilePath = "./" + uuid + ".zip";
+      File dir = new File(ZIP_PREFIX);
+      if (!dir.exists()) {
+        FileUtils.forceMkdir(dir);
+      }
+
+      String zipFilePath = ZIP_PREFIX + packedId + ".zip";
       FileOutputStream outputStream = new FileOutputStream(zipFilePath);
       outputStream.write(bytes);
       outputStream.close();

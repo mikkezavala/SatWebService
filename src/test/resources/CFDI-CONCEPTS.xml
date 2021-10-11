@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Certificado="CERT==" SubTotal="0.01" TipoCambio="1" TipoDeComprobante="I" Total="0.00" Version="3.3" xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd">
+  <cfdi:Emisor Nombre="BBVA BANCOMER, S.A." RegimenFiscal="601" Rfc="BBA830831LJ2" />
+  <cfdi:Receptor Nombre="CUSTOMER NAME" Rfc="XXXX8503016C3" UsoCFDI="P01" />
+  <cfdi:Conceptos>
+    <cfdi:Concepto Cantidad="1.00" ClaveProdServ="84121500" ClaveUnidad="E48" Descripcion="Servicios de Facturación" Descuento="0.01" Importe="0.01" NoIdentificacion="1" Unidad="SERVICIO" ValorUnitario="0.01" />
+  </cfdi:Conceptos>
+  <cfdi:Complemento>
+    <tfd:TimbreFiscalDigital xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="1.1" UUID="UUID-000001" FechaTimbrado="2021-09-01T09:38:14" RfcProvCertif="BBA830831LJ2" SelloCFD="SELLO==" xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" />
+  </cfdi:Complemento>
+</cfdi:Comprobante>

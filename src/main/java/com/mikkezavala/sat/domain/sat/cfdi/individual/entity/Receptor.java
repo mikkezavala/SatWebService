@@ -1,4 +1,4 @@
-package com.mikkezavala.sat.domain.sat.cfdi.entity;
+package com.mikkezavala.sat.domain.sat.cfdi.individual.entity;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Issuer {
+public class Receptor {
 
   @XmlAttribute(name = "Rfc")
   private String rfc;
@@ -15,7 +15,7 @@ public class Issuer {
   @XmlAttribute(name = "Nombre")
   private String name;
 
-  @XmlAttribute(name = "RegimenFiscal")
-  private String fiscalRegime;
+  @XmlAttribute(name = "UsoCFDI")
+  private String cfdiUse;
 
 }
