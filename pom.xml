@@ -55,12 +55,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>io.jsonwebtoken</groupId>
-      <artifactId>jjwt</artifactId>
-      <version>${jwt.version}</version>
-    </dependency>
-
     <!-- Data-->
     <dependency>
       <groupId>mysql</groupId>
