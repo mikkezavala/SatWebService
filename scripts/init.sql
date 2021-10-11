@@ -41,6 +41,7 @@ CREATE TABLE sat_packet
     last_requested  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     packet_id       VARCHAR(254) NULL,
     path            VARCHAR(255) NULL,
+    consumed        TINYINT   DEFAULT 0,
     INDEX idx_rfc_packet (rfc, request_id)
 );
 COMMIT;

@@ -1,6 +1,7 @@
 package com.mikkezavala.sat.service;
 
-import static com.mikkezavala.sat.util.SoapUtil.ENV_PREFIX;
+
+import static com.mikkezavala.sat.util.Constant.ENV_PREFIX;
 
 import com.mikkezavala.sat.util.XmlUtil;
 import java.io.StringReader;

@@ -28,6 +28,8 @@ public class SatPacket {
 
   private String status;
 
+  private boolean consumed;
+
   private String path;
 
   private String message;
@@ -39,6 +41,8 @@ public class SatPacket {
   private ZonedDateTime dateEnd;
 
   private ZonedDateTime dateStart;
+
+  private ZonedDateTime lastRequested;
 
   private Integer timesRequested;
 
