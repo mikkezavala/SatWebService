@@ -2,6 +2,7 @@
 
 ## Build Status
 [![CircleCI](https://circleci.com/gh/mikkezavala/SatWebService/tree/main.svg?style=svg)](https://circleci.com/gh/mikkezavala/SatWebService/tree/main)
+[![codecov](https://codecov.io/gh/mikkezavala/SatWebService/branch/main/graph/badge.svg?token=84OAPS6E4O)](https://codecov.io/gh/mikkezavala/SatWebService)
 
 ## Como iniciar
 - Instalar docker
