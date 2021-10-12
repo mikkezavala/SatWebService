@@ -18,21 +18,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * The type Soap service test.
  */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
 public class SoapServiceTest extends TestBase {
 
   @Mock
   private SatClientRepository mockRepository;
 
-  @Autowired
   private SoapHandler handler;
 
   @InjectMocks
@@ -53,6 +49,7 @@ public class SoapServiceTest extends TestBase {
     satClient.setKeystore(pfxFile.getPath());
     satClient.setPasswordPlain("12345678a");
 
+    handler = new SoapHandler(getMessageFactory(), getSoapFactory(), getBuilderFactory());
     service = new SoapService(handler, mockRepository);
     when(mockRepository.findSatClientByRfc(anyString())).thenReturn(satClient);
   }
