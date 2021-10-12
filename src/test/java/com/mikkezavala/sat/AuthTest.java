@@ -19,15 +19,23 @@ import javax.xml.soap.SOAPMessage;
 import org.junit.jupiter.api.Test;
 
 
+/**
+ * The type Auth test.
+ */
 public class AuthTest extends TestBase {
 
+  /**
+   * Should parse auth response.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldParseAuthResponse() throws Exception {
 
-    File inpt = loadResource("AUTH.xml");
-    FileInputStream fos = new FileInputStream(inpt);
+    File input = loadResource("AUTH.xml");
+    FileInputStream fos = new FileInputStream(input);
 
-    MessageFactory factory = MessageFactory.newInstance();
+    MessageFactory factory = getMessageFactory();
     SOAPMessage message = factory.createMessage(new MimeHeaders(), fos);
     JAXBContext context = JAXBContext.newInstance(AuthResponse.class);
 

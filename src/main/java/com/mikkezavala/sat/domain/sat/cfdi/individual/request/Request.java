@@ -5,8 +5,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 @Data
+@Accessors(fluent = true)
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "solicitud")
 public class Request {
@@ -15,21 +18,21 @@ public class Request {
   private String id;
 
   @XmlAttribute(name = "FechaFinal")
-  private String fechaFinal;
+  private String dateEnd;
 
   @XmlAttribute(name = "FechaInicial")
-  private String fechaInicial;
+  private String dateStart;
 
   @XmlAttribute(name = "RfcEmisor")
-  private String rfcEmisor;
+  private String rfcIssuer;
 
   @XmlAttribute(name = "RfcReceptor")
   private String rfcReceptor;
 
   @XmlAttribute(name = "RfcSolicitante")
-  private String rfcSolicitante;
+  private String rfcRequest;
 
   @XmlAttribute(name = "TipoSolicitud")
-  private String tipoSolicitud;
+  private String requestType;
 
 }

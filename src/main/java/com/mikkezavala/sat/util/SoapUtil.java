@@ -7,14 +7,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.Node;
@@ -27,14 +38,14 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public class SoapUtil {
-
-  public final static String ENV_PREFIX = "s";
 
   private static final String SEPARATOR = File.separator;
 
   private static final String TOKEN_FORMAT = "WRAP access_token=\"%s\"";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(SoapUtil.class);
 
   public static <T> T callWebService(
@@ -47,7 +58,7 @@ public class SoapUtil {
     MimeHeaders headers = new MimeHeaders();
     String uuid = UUID.randomUUID().toString();
 
-    String filePrefix = getFilePrefix(clazz);
+    String filePrefix = endpoint.name().toLowerCase();
     File soapRequest = saveFile(message, uuid, filePrefix + "-" + "request");
 
     String url;
@@ -109,13 +120,6 @@ public class SoapUtil {
     }
 
     return file;
-  }
-
-  private static <T> String getFilePrefix(Class<T> clazz) {
-    String[] parts = clazz.getName().split("\\.");
-    String group = parts.length >= 3 ? parts[parts.length - 3] : "unknown";
-
-    return (group + "-" + parts[parts.length - 2]).toLowerCase();
   }
 
   private static Timestamp createTimestamp(SOAPElement header) {

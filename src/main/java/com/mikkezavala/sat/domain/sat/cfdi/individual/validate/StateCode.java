@@ -10,5 +10,5 @@ public enum StateCode {
   @XmlEnumValue("3") READY,
   @XmlEnumValue("4") ERROR,
   @XmlEnumValue("5") REJECTED,
-  @XmlEnumValue("6") EXPIRED
+  @XmlEnumValue("6") EXPIRED;
 }
