@@ -1,3 +1,3 @@
 ignore:
-  - "com/mikkezavala/sat/domain/**/*"
-  - "com/mikkezavala/sat/configuration/**/*"
+  - "src/main/java/com/mikkezavala/sat/domain/**/*"
+  - "src/main/java/com/mikkezavala/sat/configuration/**/*"
