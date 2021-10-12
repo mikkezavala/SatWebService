@@ -51,6 +51,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -87,7 +88,7 @@ public class SoapService {
     header.addNamespaceDeclaration("u", WSS_UTILITY_NS);
 
     body.addChildElement(soapHandler.createNodeOf(new Auth()));
-    body.addAttribute(envelope.createName("Id", "", WSS_UTILITY_NS), "Body");
+    // body.addAttribute(envelope.createName("Id", "", WSS_UTILITY_NS), "Body");
 
     return message;
   }
@@ -261,22 +262,22 @@ public class SoapService {
   }
 
   private Certificate getCertificate(String rfc) throws Exception {
-
     SatClient client = repository.findSatClientByRfc(rfc);
-    Resource cert = new ClassPathResource(client.getKeystore());
-
-    KeyStore keystore = KeyStore.getInstance("PKCS12");
-    keystore.load(cert.getInputStream(), client.getPasswordPlain().toCharArray());
-    return keystore.getCertificate("1");
+    return getKeyStore(client).getCertificate("1");
   }
 
   private PrivateKey getKeyFormCert(String rfc) throws Exception {
-
     SatClient client = repository.findSatClientByRfc(rfc);
-    Resource cert = new ClassPathResource(client.getKeystore());
+    return (PrivateKey) getKeyStore(client).getKey("1", client.getPasswordPlain().toCharArray());
+  }
+
+  private KeyStore getKeyStore(SatClient client) throws Exception {
+
+    Resource cert = new FileSystemResource(client.getKeystore());
 
     KeyStore keystore = KeyStore.getInstance("PKCS12");
     keystore.load(cert.getInputStream(), client.getPasswordPlain().toCharArray());
-    return (PrivateKey) keystore.getKey("1", client.getPasswordPlain().toCharArray());
+
+    return keystore;
   }
 }

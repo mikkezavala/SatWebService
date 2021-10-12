@@ -4,6 +4,10 @@ public class Constant {
 
   public final static String ENV_PREFIX = "s";
 
+  public final static String SAT_DESCARGA_NS = "http://DescargaMasivaTerceros.gob.mx";
+
+  public final static String ENVELOPE_NS = "http://schemas.xmlsoap.org/soap/envelope/";
+
   public final static String WSS_SEC_EXT_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 
   public final static String WSS_UTILITY_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
