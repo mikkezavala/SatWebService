@@ -1,1 +1,3 @@
-
+ignore:
+  - "com.mikkezavala.sat.domain/**/*"
+  - "com.mikkezavala.sat.configuration/**/*"
