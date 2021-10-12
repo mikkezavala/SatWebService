@@ -86,9 +86,7 @@ public class SoapService {
     addSignature(security, timestamp, rfc);
     header.setPrefix(ENV_PREFIX);
     header.addNamespaceDeclaration("u", WSS_UTILITY_NS);
-
     body.addChildElement(soapHandler.createNodeOf(new Auth()));
-    // body.addAttribute(envelope.createName("Id", "", WSS_UTILITY_NS), "Body");
 
     return message;
   }
