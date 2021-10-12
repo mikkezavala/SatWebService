@@ -91,6 +91,11 @@ public class SoapServiceTest extends TestBase {
     );
   }
 
+  /**
+   * Should create download request.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldCreateDownloadRequest() throws Exception {
 
@@ -125,6 +130,11 @@ public class SoapServiceTest extends TestBase {
     ).isEqualTo("CFDI");
   }
 
+  /**
+   * Should create download validation.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldCreateDownloadValidation() throws Exception {
 
@@ -147,6 +157,34 @@ public class SoapServiceTest extends TestBase {
     assertThat(xml).withNamespaceContext(context).valueByXPath(
         "//s:Envelope/s:Body/*[local-name()='VerificaSolicitudDescarga']/*[local-name()='solicitud']/@RfcSolicitante"
     ).isEqualTo("XOJI740919U48");
+  }
 
+  /**
+   * Should create download.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  public void shouldCreateDownload() throws Exception {
+
+    Map<String, String> context = getNSContext();
+
+    String uuid = UUID.randomUUID().toString();
+    SOAPMessage message = service.descarga(uuid, "XOJI740919U48");
+
+    String xml = soapToString(message);
+    assertThat(xml).withNamespaceContext(context).hasXPath("//s:Envelope");
+    assertThat(xml).withNamespaceContext(context).hasXPath(
+        "//s:Envelope/s:Body/*[local-name()='PeticionDescargaMasivaTercerosEntrada']/*[local-name()='peticionDescarga']"
+    );
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='PeticionDescargaMasivaTercerosEntrada']/*[local-name()='peticionDescarga']/*[local-name()='Signature']"
+    ).isNotEmpty();
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='PeticionDescargaMasivaTercerosEntrada']/*[local-name()='peticionDescarga']/@IdPaquete"
+    ).isEqualTo(uuid);
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='PeticionDescargaMasivaTercerosEntrada']/*[local-name()='peticionDescarga']/@RfcSolicitante"
+    ).isEqualTo("XOJI740919U48");
   }
 }
