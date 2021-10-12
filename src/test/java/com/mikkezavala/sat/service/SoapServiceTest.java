@@ -1,5 +1,6 @@
 package com.mikkezavala.sat.service;
 
+import static com.mikkezavala.sat.util.Constant.FORMATTER;
 import static com.mikkezavala.sat.util.Constant.WSS_SEC_EXT_NS;
 import static com.mikkezavala.sat.util.Constant.WSS_UTILITY_NS;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -11,6 +12,7 @@ import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
 import com.mikkezavala.sat.repository.SatClientRepository;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import javax.xml.soap.SOAPMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,8 +30,6 @@ public class SoapServiceTest extends TestBase {
 
   @Mock
   private SatClientRepository mockRepository;
-
-  private SoapHandler handler;
 
   @InjectMocks
   private SoapService service;
@@ -49,7 +49,10 @@ public class SoapServiceTest extends TestBase {
     satClient.setKeystore(pfxFile.getPath());
     satClient.setPasswordPlain("12345678a");
 
-    handler = new SoapHandler(getMessageFactory(), getSoapFactory(), getBuilderFactory());
+    SoapHandler handler = new SoapHandler(
+        getMessageFactory(), getSoapFactory(), getBuilderFactory()
+    );
+
     service = new SoapService(handler, mockRepository);
     when(mockRepository.findSatClientByRfc(anyString())).thenReturn(satClient);
   }
@@ -85,6 +88,40 @@ public class SoapServiceTest extends TestBase {
     assertThat(xml).withNamespaceContext(context).hasXPath("//s:Envelope/s:Body").anyMatch(n ->
         n.getFirstChild().getLocalName().equals("Autentica")
     );
+  }
+
+  @Test
+  public void shouldCreateDownloadRequest() throws Exception {
+
+    Map<String, String> context = getNSContext();
+    ZonedDateTime startDateDate = ZonedDateTime.now();
+    ZonedDateTime endDate = ZonedDateTime.now().plusDays(2);
+
+    SOAPMessage message = service.solicita("XOJI740919U48", startDateDate, endDate);
+
+    String xml = soapToString(message);
+    assertThat(xml).withNamespaceContext(context).hasXPath("//s:Envelope");
+    assertThat(xml).withNamespaceContext(context).hasXPath(
+        "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/*[local-name()='Signature']");
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+            "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/*[local-name()='Signature']")
+        .isNotEmpty();
+
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/@FechaInicial"
+    ).isEqualTo(startDateDate.format(FORMATTER));
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/@FechaFinal"
+    ).isEqualTo(endDate.format(FORMATTER));
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/@RfcReceptor"
+    ).isEqualTo("XOJI740919U48");
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/@RfcSolicitante"
+    ).isEqualTo("XOJI740919U48");
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/@TipoSolicitud"
+    ).isEqualTo("CFDI");
   }
 
 }

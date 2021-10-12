@@ -1,6 +1,7 @@
 package com.mikkezavala.sat.service;
 
 import static com.mikkezavala.sat.util.Constant.ENV_PREFIX;
+import static com.mikkezavala.sat.util.Constant.FORMATTER;
 import static com.mikkezavala.sat.util.Constant.WSS_MESSAGE_SECURITY_NS;
 import static com.mikkezavala.sat.util.Constant.WSS_SEC_EXT_NS;
 import static com.mikkezavala.sat.util.Constant.WSS_TOKEN_PROFILE_NS;
@@ -63,9 +64,8 @@ public class SoapService {
 
   private final static int EXPIRES = 50000;
   private final static String REQUEST_TYPE = "CFDI";
-  private final static String DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
+
   private final static XMLSignatureFactory SIGN_FACTORY = XMLSignatureFactory.getInstance("DOM");
-  private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
   public SoapService(SoapHandler soapHandler, SatClientRepository repository) {
     this.soapHandler = soapHandler;

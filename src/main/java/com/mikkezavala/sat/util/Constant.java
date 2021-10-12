@@ -1,8 +1,14 @@
 package com.mikkezavala.sat.util;
 
+import java.time.format.DateTimeFormatter;
+
 public class Constant {
 
   public final static String ENV_PREFIX = "s";
+
+  public final static String DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
+
+  public final static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
   public final static String SAT_DESCARGA_NS = "http://DescargaMasivaTerceros.gob.mx";
 
