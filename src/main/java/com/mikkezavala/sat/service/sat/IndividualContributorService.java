@@ -4,6 +4,7 @@ import static com.mikkezavala.sat.domain.sat.SoapEndpoint.AUTENTICA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.DESCARGA_MASIVA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.SOLICITA_DESCARGA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.VALIDA_DESCARGA;
+import static com.mikkezavala.sat.domain.sat.cfdi.individual.validate.StateCode.READY;
 import static com.mikkezavala.sat.util.ResourceUtil.getFromZip;
 import static com.mikkezavala.sat.util.ResourceUtil.saveZip;
 
@@ -33,6 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * The type Individual contributor service.
+ */
 @Service
 public class IndividualContributorService {
 
@@ -47,6 +51,13 @@ public class IndividualContributorService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndividualContributorService.class);
 
+  /**
+   * Instantiates a new Individual contributor service.
+   *
+   * @param service             the service
+   * @param repository          the repository
+   * @param satPacketRepository the sat packet repository
+   */
   public IndividualContributorService(
       SoapService service, SatTokenRepository repository, SatPacketRepository satPacketRepository
   ) {
@@ -55,6 +66,12 @@ public class IndividualContributorService {
     this.satPacketRepository = satPacketRepository;
   }
 
+  /**
+   * Gets receptor invoices.
+   *
+   * @param request the request
+   * @return the receptor invoices
+   */
   public Invoices getReceptorInvoices(RequestCfdi request) {
 
     String rfc = request.getRfc();
@@ -77,7 +94,7 @@ public class IndividualContributorService {
         satToken = getToken(existentRfc);
       }
 
-      if (!StateCode.valueOf(satPacket.getState()).equals(StateCode.READY)) {
+      if (!StateCode.equals(satPacket.getState(), READY)) {
         Duration delta = Duration.between(
             satPacket.getLastRequested().withZoneSameLocal(ZoneId.of("UTC")),
             ZonedDateTime.now()
@@ -108,15 +125,17 @@ public class IndividualContributorService {
         String requestId = response.getResult().getRequestId();
         satPacket = validateRequest(requestId, request, satToken);
         if (
-            Objects.nonNull(satPacket) && StateCode.valueOf(satPacket.getState())
-                .equals(StateCode.READY)
+            Objects.nonNull(satPacket) && StateCode.equals(satPacket.getState(), READY)
         ) {
           satPacket = descarga(satPacket, satToken);
+
+          if (StringUtils.isNotEmpty(satPacket.getPath())) {
+            invoices = getFromZip(satPacket.getPath(), Invoice.class);
+          }
         }
       }
     }
-    return builder
-        .satState(StateCode.valueOf(satPacket.getState())).invoices(invoices).build();
+    return builder.satState(StateCode.getCode(satPacket.getState())).invoices(invoices).build();
   }
 
   private SatToken getToken(String rfc) {
@@ -156,8 +175,9 @@ public class IndividualContributorService {
     try {
       String rfc = request.getRfc();
       String runtimeToken = token.getToken();
+      ZonedDateTime nowTime = ZonedDateTime.now();
       ZonedDateTime expires = token.getExpiration();
-      Duration tokenValidity = Duration.between(ZonedDateTime.now(), expires);
+      Duration tokenValidity = Duration.between(nowTime, expires);
 
       LOGGER.info("Token Valid for (in validateRequest): {} seconds", tokenValidity.getSeconds());
       ValidateResponse response = SoapUtil.callWebService(
@@ -172,6 +192,7 @@ public class IndividualContributorService {
           .path("")
           .timesRequested(1)
           .requestId(requestId)
+          .lastRequested(nowTime)
           .status(result.getStatus())
           .message(result.getMessage())
           .dateEnd(request.getDateEnd())

@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * The type Individual contributor controller.
+ */
 @RestController
 @RequestMapping(path = "/v1/persona-fisica")
 public class IndividualContributorController {
@@ -17,10 +20,21 @@ public class IndividualContributorController {
       IndividualContributorController.class);
   private final IndividualContributorService service;
 
+  /**
+   * Instantiates a new Individual contributor controller.
+   *
+   * @param service the service
+   */
   public IndividualContributorController(IndividualContributorService service) {
     this.service = service;
   }
 
+  /**
+   * Retrieve object.
+   *
+   * @param request the request
+   * @return the object
+   */
   @PostMapping("/download-received")
   public Object retrieve(@RequestBody RequestCfdi request) {
     return service.getReceptorInvoices(request);
