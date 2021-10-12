@@ -156,8 +156,8 @@
         </executions>
         <configuration>
           <excludes>
-            <exclude>com.mikkezavala.sat.domain/**</exclude>
-            <exclude>com.mikkezavala.sat.configuration/**</exclude>
+            <exclude>com.mikkezavala.sat.domain/**/*</exclude>
+            <exclude>com.mikkezavala.sat.configuration/**/*</exclude>
           </excludes>
           <systemPropertyVariables>
             <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>

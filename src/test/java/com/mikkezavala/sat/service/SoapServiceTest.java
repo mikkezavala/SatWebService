@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.UUID;
 import javax.xml.soap.SOAPMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -102,11 +103,11 @@ public class SoapServiceTest extends TestBase {
     String xml = soapToString(message);
     assertThat(xml).withNamespaceContext(context).hasXPath("//s:Envelope");
     assertThat(xml).withNamespaceContext(context).hasXPath(
-        "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/*[local-name()='Signature']");
+        "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/*[local-name()='Signature']"
+    );
     assertThat(xml).withNamespaceContext(context).valueByXPath(
-            "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/*[local-name()='Signature']")
-        .isNotEmpty();
-
+        "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/*[local-name()='Signature']"
+    ).isNotEmpty();
     assertThat(xml).withNamespaceContext(context).valueByXPath(
         "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/@FechaInicial"
     ).isEqualTo(startDateDate.format(FORMATTER));
@@ -124,4 +125,28 @@ public class SoapServiceTest extends TestBase {
     ).isEqualTo("CFDI");
   }
 
+  @Test
+  public void shouldCreateDownloadValidation() throws Exception {
+
+    Map<String, String> context = getNSContext();
+
+    String uuid = UUID.randomUUID().toString();
+    SOAPMessage message = service.valida(uuid, "XOJI740919U48");
+
+    String xml = soapToString(message);
+    assertThat(xml).withNamespaceContext(context).hasXPath("//s:Envelope");
+    assertThat(xml).withNamespaceContext(context).hasXPath(
+        "//s:Envelope/s:Body/*[local-name()='VerificaSolicitudDescarga']/*[local-name()='solicitud']"
+    );
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='VerificaSolicitudDescarga']/*[local-name()='solicitud']/*[local-name()='Signature']"
+    ).isNotEmpty();
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='VerificaSolicitudDescarga']/*[local-name()='solicitud']/@IdSolicitud"
+    ).isEqualTo(uuid);
+    assertThat(xml).withNamespaceContext(context).valueByXPath(
+        "//s:Envelope/s:Body/*[local-name()='VerificaSolicitudDescarga']/*[local-name()='solicitud']/@RfcSolicitante"
+    ).isEqualTo("XOJI740919U48");
+
+  }
 }
