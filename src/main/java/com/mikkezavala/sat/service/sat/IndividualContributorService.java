@@ -38,9 +38,13 @@ public class IndividualContributorService {
 
 
   private final SoapService service;
-  private final int BACKOFF_TIME = 240;
+
   private final SatTokenRepository repository;
+
   private final SatPacketRepository satPacketRepository;
+
+  private static final int BACKOFF_TIME = 240;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(IndividualContributorService.class);
 
   public IndividualContributorService(
