@@ -1,4 +1,4 @@
-FROM amazoncorretto:11-alpine
+FROM amazoncorretto:17-alpine
 
 ARG JAR_FILE=target/sat-web-service.jar
 
