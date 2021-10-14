@@ -135,13 +135,14 @@ public class IndividualContributorService {
             Objects.nonNull(satPacket) && StateCode.equals(satPacket.getState(), READY)
         ) {
           satPacket = descarga(satPacket, satToken);
-
-          if (StringUtils.isNotEmpty(satPacket.getPath())) {
-            invoices = getFromZip(satPacket.getPath(), Invoice.class);
-          }
         }
       }
     }
+
+    if (StringUtils.isNotEmpty(satPacket.getPath())) {
+      invoices = getFromZip(satPacket.getPath(), Invoice.class);
+    }
+
     return builder.satState(StateCode.getCode(satPacket.getState())).invoices(invoices).build();
   }
 

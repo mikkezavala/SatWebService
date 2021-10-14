@@ -64,7 +64,7 @@ public class DescargaTest extends TestBase {
         .unmarshal(doc, Invoice.class);
 
     Invoice resolved = body.getValue();
-   /// assertThat(resolved.getComplement().getPayroll().getTotalDeductions()).isEqualTo(24860.95);
+    assertThat(resolved.getIssuer().getRfc()).isEqualTo("BBA830831LJ2");
   }
 
 
