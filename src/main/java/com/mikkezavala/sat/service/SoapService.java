@@ -18,6 +18,7 @@ import com.mikkezavala.sat.domain.sat.cfdi.individual.request.Request;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.request.RequestDownload;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.validate.ValidateDownload;
 import com.mikkezavala.sat.repository.SatClientRepository;
+import java.io.File;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -79,12 +80,11 @@ public class SoapService {
     SOAPHeader header = message.getSOAPHeader();
     SOAPElement timestamp = createTimestampElement();
     SOAPElement security = createSecurityElement(header, rfc);
-    SOAPEnvelope envelope = message.getSOAPPart().getEnvelope();
 
     security.addChildElement(timestamp);
-
     addSignature(security, timestamp, rfc);
     header.setPrefix(ENV_PREFIX);
+
     header.addNamespaceDeclaration("u", WSS_UTILITY_NS);
     body.addChildElement(soapHandler.createNodeOf(new Auth()));
 
