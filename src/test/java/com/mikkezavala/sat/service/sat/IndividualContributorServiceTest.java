@@ -58,13 +58,15 @@ public class IndividualContributorServiceTest extends TestBase {
 
   private IndividualContributorService service;
 
+  private static String RFC_CUSTOMER = "XOJI740919U48";
+
   @BeforeEach
   void init() throws Exception {
 
     File pfxFile = loadResource("PF_CFDI/XOJI740919U48.pfx");
     SatClient satClient = new SatClient();
     satClient.setId(1);
-    satClient.setRfc("XOJI740919U48");
+    satClient.setRfc(RFC_CUSTOMER);
     satClient.setKeystore(pfxFile.getPath());
     satClient.setPasswordPlain("12345678a");
 
@@ -134,15 +136,67 @@ public class IndividualContributorServiceTest extends TestBase {
 
     when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
         anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
-    ).thenReturn(SatPacket.builder().packetId(satPacketId).state(StateCode.IN_PROGRESS.name()).build());
+    ).thenReturn(
+        SatPacket.builder().packetId(satPacketId).state(StateCode.IN_PROGRESS.name()).build()
+    );
 
     ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
     ZonedDateTime dateStart = dateEnd.minusDays(5);
-    request.setRfc("XOJI740919U48");
+    request.setRfc(RFC_CUSTOMER);
     request.setDateEnd(dateEnd);
     request.setDateStart(dateStart);
 
     Invoices invoices = service.getReceptorInvoices(request);
     assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
+  }
+
+  @Test
+  public void shouldReturnReady() throws Exception {
+    RequestCfdi request = new RequestCfdi();
+    ZonedDateTime now = ZonedDateTime.now();
+
+    String requestId = UUID.randomUUID().toString();
+    String satPacketId = UUID.randomUUID().toString();
+
+    ValidateResponse validation = new ValidateResponse();
+    ValidateResult validationResult = new ValidateResult();
+
+    validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
+    validationResult.setState(StateCode.READY);
+    validationResult.setStatus("5000");
+    validationResult.setCfdiCount(5);
+    validation.setResult(validationResult);
+
+    when(soapUtil.callWebService(
+        any(), any(), eq(VALIDA_DESCARGA),
+        anyString())
+    ).thenReturn(validation);
+
+    when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
+        anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
+    ).thenReturn(SatPacket.builder()
+        .rfc(RFC_CUSTOMER)
+        .timesRequested(1)
+        .requestId(requestId)
+        .packetId(satPacketId)
+        .state(StateCode.READY.name()).build()
+    );
+
+    when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
+        .id(1)
+        .token("fakToken")
+        .rfc(RFC_CUSTOMER)
+        .expiration(now.minusMinutes(5))
+        .created(ZonedDateTime.now().minusMinutes(3)).build()
+    );
+
+    ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
+    ZonedDateTime dateStart = dateEnd.minusDays(5);
+    request.setRfc(RFC_CUSTOMER);
+    request.setDateEnd(dateEnd);
+    request.setDateStart(dateStart);
+
+    Invoices invoices = service.getReceptorInvoices(request);
+    assertThat(invoices.getSatState()).isEqualTo(StateCode.READY);
   }
 }
