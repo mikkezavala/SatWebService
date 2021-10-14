@@ -2,6 +2,7 @@ package com.mikkezavala.sat;
 
 import static com.mikkezavala.sat.util.Constant.ENVELOPE_NS;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -66,6 +67,16 @@ abstract public class TestBase {
       return Base64.getEncoder().encodeToString(IOUtils.toByteArray(zipFile));
     } catch (IOException e) {
       throw new RuntimeException("Reading ZIP file failed");
+    }
+  }
+
+  protected SOAPMessage response(String file) {
+    try (InputStream is = new ByteArrayInputStream(
+        new FileInputStream(loadResource(file)).readAllBytes())
+    ) {
+      return getMessageFactory().createMessage(null, is);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to parse");
     }
   }
 

@@ -19,7 +19,6 @@ import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.Node;
 import javax.xml.soap.SOAPConnection;
-import javax.xml.soap.SOAPConnectionFactory;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
@@ -32,11 +31,24 @@ import org.w3c.dom.Document;
 @Component
 public class SoapUtil {
 
+  private final MessageFactory messageFactory;
+
+  private final SOAPConnection soapConnection;
+
   private static final String SEPARATOR = File.separator;
+
+  private static final String AUTH_HEADER = "Authorization";
+
+  private static final String SOAP_HEADER_PREFIX = "SOAPAction";
 
   private static final String TOKEN_FORMAT = "WRAP access_token=\"%s\"";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SoapUtil.class);
+
+  public SoapUtil(MessageFactory messageFactory, SOAPConnection soapConnection) {
+    this.messageFactory = messageFactory;
+    this.soapConnection = soapConnection;
+  }
 
   public <T> T callWebService(
       SOAPMessage message,
@@ -55,18 +67,15 @@ public class SoapUtil {
     String action;
 
     if (authHeader != null) {
-      headers.addHeader("Authorization", String.format(TOKEN_FORMAT, authHeader));
+      headers.addHeader(AUTH_HEADER, String.format(TOKEN_FORMAT, authHeader));
     }
 
     url = endpoint.getEndpoint();
     action = endpoint.getAction();
 
-    headers.addHeader("SOAPAction", action);
+    headers.addHeader(SOAP_HEADER_PREFIX, action);
     FileInputStream fos = new FileInputStream(soapRequest);
-    SOAPMessage msg = MessageFactory.newInstance().createMessage(headers, fos);
-
-    SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
-    SOAPConnection soapConnection = soapConnectionFactory.createConnection();
+    SOAPMessage msg = messageFactory.createMessage(headers, fos);
 
     LOGGER.info("Calling Action: {} in url: {} for: {}", action, url, endpoint.name());
 
