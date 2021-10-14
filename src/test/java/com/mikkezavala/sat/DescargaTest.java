@@ -66,6 +66,5 @@ public class DescargaTest extends TestBase {
     Invoice resolved = body.getValue();
     assertThat(resolved.getIssuer().getRfc()).isEqualTo("BBA830831LJ2");
   }
-
-
+  
 }
