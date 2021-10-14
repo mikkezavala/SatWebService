@@ -184,7 +184,7 @@ public class IndividualContributorServiceTest extends TestBase {
 
     when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
         .id(1)
-        .token("fakToken")
+        .token("fakeToken")
         .rfc(RFC_CUSTOMER)
         .expiration(now.minusMinutes(5))
         .created(ZonedDateTime.now().minusMinutes(3)).build()
