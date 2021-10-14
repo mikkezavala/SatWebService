@@ -52,7 +52,6 @@ public class AuthTest extends TestBase {
         if (el instanceof SOAPElement) {
           SOAPElement soapElement = (SOAPElement) el;
           String name = soapElement.getElementName().getLocalName();
-          System.out.println(name + ": " + el.getTextContent());
         }
       }
     }
