@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Invoice;
 import java.io.File;
 import java.io.FileInputStream;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.parsers.DocumentBuilder;
@@ -14,8 +13,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
+/**
+ * The type Descarga test.
+ */
 public class DescargaTest extends TestBase {
 
+  /**
+   * Should parse domain.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldParseDomain() throws Exception {
 
@@ -33,6 +40,11 @@ public class DescargaTest extends TestBase {
     assertThat(resolved.getComplement().getPayments().getPayment().getAmount()).isEqualTo(599.0);
   }
 
+  /**
+   * Should parse payroll domain.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldParsePayrollDomain() throws Exception {
 
@@ -50,6 +62,11 @@ public class DescargaTest extends TestBase {
     assertThat(resolved.getComplement().getPayroll().getTotalDeductions()).isEqualTo(24860.95);
   }
 
+  /**
+   * Should parse concepts.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldParseConcepts() throws Exception {
 

@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPConnectionFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPMessage;
@@ -59,6 +61,14 @@ abstract public class TestBase {
     builder.setNamespaceAware(true);
 
     return builder;
+  }
+
+  protected SOAPConnection getSoapConnection() {
+    try {
+      return SOAPConnectionFactory.newInstance().createConnection();
+    } catch (SOAPException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   protected String extractFile(String testResource) {
