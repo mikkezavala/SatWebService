@@ -36,12 +36,16 @@ import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+/**
+ * The type Individual contributor service test.
+ */
 @ExtendWith(SpringExtension.class)
 public class IndividualContributorServiceTest extends TestBase {
 
@@ -61,8 +65,16 @@ public class IndividualContributorServiceTest extends TestBase {
 
   private IndividualContributorService service;
 
-  private static String RFC_CUSTOMER = "XOJI740919U48";
+  private static final String RFC_CUSTOMER = "XOJI740919U48";
 
+  private static final Pattern BACKOFF_PATTERN = Pattern.compile(
+      "Backing off validation request\\. Wait time: \\d+ minutes");
+
+  /**
+   * Init.
+   *
+   * @throws Exception the exception
+   */
   @BeforeEach
   void init() throws Exception {
 
@@ -119,6 +131,11 @@ public class IndividualContributorServiceTest extends TestBase {
     );
   }
 
+  /**
+   * Should return in progress.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldReturnInProgress() throws Exception {
     RequestCfdi request = new RequestCfdi();
@@ -153,6 +170,116 @@ public class IndividualContributorServiceTest extends TestBase {
     assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
   }
 
+  /**
+   * Should validate request.
+   */
+  @Test
+  public void shouldValidateRequest() {
+    RequestCfdi request = new RequestCfdi();
+    String requestId = UUID.randomUUID().toString();
+    String satPacketId = UUID.randomUUID().toString();
+    ValidateResponse validation = new ValidateResponse();
+    ValidateResult validationResult = new ValidateResult();
+
+    validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
+    validationResult.setState(StateCode.IN_PROGRESS);
+    validationResult.setStatus("5000");
+    validationResult.setCfdiCount(5);
+    validation.setResult(validationResult);
+
+    when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
+        anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
+    ).thenReturn(SatPacket.builder()
+        .rfc(RFC_CUSTOMER)
+        .requestId(requestId)
+        .timesRequested(1)
+        .packetId(satPacketId)
+        .state(StateCode.IN_PROGRESS.name())
+        .lastRequested(ZonedDateTime.now().minusMinutes(1)).build()
+    );
+
+    when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
+        .id(1)
+        .rfc(RFC_CUSTOMER)
+        .token("fakeToken")
+        .created(ZonedDateTime.now().minusMinutes(3))
+        .expiration(ZonedDateTime.now().minusMinutes(5)).build()
+    );
+
+    ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
+    ZonedDateTime dateStart = dateEnd.minusDays(5);
+    request.setRfc(RFC_CUSTOMER);
+    request.setDateEnd(dateEnd);
+    request.setDateStart(dateStart);
+
+    Invoices invoices = service.getReceptorInvoices(request);
+    assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
+  }
+
+  @Test
+  public void shouldValidateRequestBackoff() throws Exception {
+    RequestCfdi request = new RequestCfdi();
+    String requestId = UUID.randomUUID().toString();
+    String satPacketId = UUID.randomUUID().toString();
+    ValidateResponse validation = new ValidateResponse();
+    ValidateResult validationResult = new ValidateResult();
+
+    validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
+    validationResult.setState(StateCode.IN_PROGRESS);
+    validationResult.setStatus("5000");
+    validationResult.setCfdiCount(1);
+    validation.setResult(validationResult);
+
+    SatPacket packet = SatPacket.builder()
+        .rfc(RFC_CUSTOMER)
+        .timesRequested(1)
+        .requestId(requestId)
+        .packetId(satPacketId)
+        .state(StateCode.IN_PROGRESS.name())
+        .lastRequested(ZonedDateTime.now().minusSeconds(1)).build();
+
+    when(soapUtil.callWebService(
+        any(), any(), eq(VALIDA_DESCARGA),
+        anyString())
+    ).thenReturn(validation);
+
+    when(soapUtil.callWebService(
+        any(), any(), eq(VALIDA_DESCARGA),
+        anyString())
+    ).thenReturn(validation);
+
+    when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
+        anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
+    ).thenReturn(packet);
+
+    when(satPcktRepository.save(any())).thenReturn(packet.toBuilder().message("Accepted").build());
+
+    when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
+        .id(1)
+        .rfc(RFC_CUSTOMER)
+        .token("fakeToken")
+        .created(ZonedDateTime.now().minusMinutes(3))
+        .expiration(ZonedDateTime.now().minusMinutes(5)).build()
+    );
+
+    ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
+    ZonedDateTime dateStart = dateEnd.minusDays(5);
+    request.setRfc(RFC_CUSTOMER);
+    request.setDateEnd(dateEnd);
+    request.setDateStart(dateStart);
+
+    Invoices invoices = service.getReceptorInvoices(request);
+
+    assertThat(invoices.getMessage()).isEqualTo("Accepted");
+    assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
+
+  }
+
+  /**
+   * Should return ready.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldReturnReady() throws Exception {
     RequestCfdi request = new RequestCfdi();
@@ -204,7 +331,6 @@ public class IndividualContributorServiceTest extends TestBase {
         .expiration(now.minusMinutes(5))
         .created(ZonedDateTime.now().minusMinutes(3)).build()
     );
-
 
     ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
     ZonedDateTime dateStart = dateEnd.minusDays(5);
