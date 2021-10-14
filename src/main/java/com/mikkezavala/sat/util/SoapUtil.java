@@ -7,25 +7,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.Node;
@@ -37,9 +26,10 @@ import javax.xml.soap.SOAPMessage;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
+@Component
 public class SoapUtil {
 
   private static final String SEPARATOR = File.separator;
@@ -48,7 +38,7 @@ public class SoapUtil {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SoapUtil.class);
 
-  public static <T> T callWebService(
+  public <T> T callWebService(
       SOAPMessage message,
       Class<T> clazz,
       SoapEndpoint endpoint,

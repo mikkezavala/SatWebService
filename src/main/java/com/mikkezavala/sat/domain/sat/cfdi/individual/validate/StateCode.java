@@ -56,8 +56,7 @@ public enum StateCode {
   /**
    * Equals boolean.
    *
-   * @param value the value
-   * @param code  the code
+   * @param value the value to test
    * @return the boolean
    */
   public static boolean equals(String value, StateCode code) {

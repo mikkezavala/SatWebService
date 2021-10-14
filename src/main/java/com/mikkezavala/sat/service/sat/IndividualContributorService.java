@@ -41,6 +41,8 @@ import org.springframework.stereotype.Service;
 public class IndividualContributorService {
 
 
+  private final SoapUtil soapUtil;
+
   private final SoapService service;
 
   private final SatTokenRepository repository;
@@ -54,13 +56,18 @@ public class IndividualContributorService {
   /**
    * Instantiates a new Individual contributor service.
    *
+   * @param soapUtil
    * @param service             the service
    * @param repository          the repository
    * @param satPacketRepository the sat packet repository
    */
   public IndividualContributorService(
-      SoapService service, SatTokenRepository repository, SatPacketRepository satPacketRepository
+      SoapUtil soapUtil,
+      SoapService service,
+      SatTokenRepository repository,
+      SatPacketRepository satPacketRepository
   ) {
+    this.soapUtil = soapUtil;
     this.service = service;
     this.repository = repository;
     this.satPacketRepository = satPacketRepository;
@@ -140,7 +147,7 @@ public class IndividualContributorService {
 
   private SatToken getToken(String rfc) {
     try {
-      AuthResponse response = SoapUtil.callWebService(
+      AuthResponse response = soapUtil.callWebService(
           service.autentica(rfc), AuthResponse.class, AUTENTICA, null
       );
       ZonedDateTime tokenTo = response.getTimestamp().getExpires();
@@ -161,7 +168,7 @@ public class IndividualContributorService {
   private Response requestDownload(RequestCfdi request, SatToken token) {
     try {
       String rfc = request.getRfc();
-      return SoapUtil.callWebService(
+      return soapUtil.callWebService(
           service.solicita(rfc, request.getDateStart(), request.getDateEnd()), Response.class,
           SOLICITA_DESCARGA, token.getToken());
     } catch (Exception e) {
@@ -180,7 +187,7 @@ public class IndividualContributorService {
       Duration tokenValidity = Duration.between(nowTime, expires);
 
       LOGGER.info("Token Valid for (in validateRequest): {} seconds", tokenValidity.getSeconds());
-      ValidateResponse response = SoapUtil.callWebService(
+      ValidateResponse response = soapUtil.callWebService(
           service.valida(requestId, rfc
           ), ValidateResponse.class, VALIDA_DESCARGA, runtimeToken
       );
@@ -214,7 +221,7 @@ public class IndividualContributorService {
       Duration tokenValidity = Duration.between(ZonedDateTime.now(), expires);
 
       LOGGER.info("Token Valid for (in validateRequest): {} seconds", tokenValidity.getSeconds());
-      ValidateResponse response = SoapUtil.callWebService(
+      ValidateResponse response = soapUtil.callWebService(
           service.valida(packet.getRequestId(), packet.getRfc()
           ), ValidateResponse.class, VALIDA_DESCARGA, runtimeToken
       );
@@ -240,7 +247,7 @@ public class IndividualContributorService {
       String rfc = satPacket.getRfc();
       String packedId = satPacket.getPacketId();
       String uuid = String.format("%s_%s", rfc, packedId);
-      DownloadResponse out = SoapUtil.callWebService(
+      DownloadResponse out = soapUtil.callWebService(
           service.descarga(packedId, rfc), DownloadResponse.class, DESCARGA_MASIVA, token.getToken()
       );
 
