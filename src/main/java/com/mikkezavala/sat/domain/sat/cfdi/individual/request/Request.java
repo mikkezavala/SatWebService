@@ -5,7 +5,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Data
