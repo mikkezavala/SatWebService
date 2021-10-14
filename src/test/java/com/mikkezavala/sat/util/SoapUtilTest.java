@@ -59,7 +59,7 @@ public class SoapUtilTest extends TestBase {
   public void simpleParsing() throws Exception {
     when(soapConnection.call(any(), any())).thenReturn(response("SOLICITA.xml"));
     SOAPMessage message = buildMessage();
-    Response res = soapUtil.callWebService(message, Response.class, SOLICITA_DESCARGA, null);
+    Response res = soapUtil.callWebService(message, Response.class, SOLICITA_DESCARGA, "Fake Token");
 
     assertThat(res.getResult().getStatus()).isEqualTo("5000");
     assertThat(res.getResult().getMessage()).isEqualTo("Solicitud Aceptada");
