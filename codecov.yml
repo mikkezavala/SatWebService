@@ -1,8 +1,8 @@
 ignore:
   - "src/main/java/com/mikkezavala/sat/domain/**/*"
   - "src/main/java/com/mikkezavala/sat/configuration/**/*"
+
 coverage:
-  status:
-    project:
-      default:
-        threshold: 70%
+  precision: 2
+  round: down
+  range: "65...100"
