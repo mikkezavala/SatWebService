@@ -67,7 +67,8 @@ public class IndividualContributorServiceTest extends TestBase {
 
   private static final String RFC_CUSTOMER = "XOJI740919U48";
 
-  private static final Pattern BACKOFF_PATTERN = Pattern.compile("Backing off validation request\\. Wait time: \\d+ minutes");
+  private static final Pattern BACKOFF_PATTERN = Pattern.compile(
+      "Backing off validation request\\. Wait time: \\d+ minutes");
 
   /**
    * Init.
@@ -216,7 +217,7 @@ public class IndividualContributorServiceTest extends TestBase {
   }
 
   @Test
-  public void shouldValidateRequestBackoff() {
+  public void shouldValidateRequestBackoff() throws Exception {
     RequestCfdi request = new RequestCfdi();
     String requestId = UUID.randomUUID().toString();
     String satPacketId = UUID.randomUUID().toString();
@@ -226,19 +227,32 @@ public class IndividualContributorServiceTest extends TestBase {
     validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
     validationResult.setState(StateCode.IN_PROGRESS);
     validationResult.setStatus("5000");
-    validationResult.setCfdiCount(5);
+    validationResult.setCfdiCount(1);
     validation.setResult(validationResult);
+
+    SatPacket packet = SatPacket.builder()
+        .rfc(RFC_CUSTOMER)
+        .timesRequested(1)
+        .requestId(requestId)
+        .packetId(satPacketId)
+        .state(StateCode.IN_PROGRESS.name())
+        .lastRequested(ZonedDateTime.now().minusSeconds(1)).build();
+
+    when(soapUtil.callWebService(
+        any(), any(), eq(VALIDA_DESCARGA),
+        anyString())
+    ).thenReturn(validation);
+
+    when(soapUtil.callWebService(
+        any(), any(), eq(VALIDA_DESCARGA),
+        anyString())
+    ).thenReturn(validation);
 
     when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
         anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
-    ).thenReturn(SatPacket.builder()
-        .rfc(RFC_CUSTOMER)
-        .requestId(requestId)
-        .timesRequested(6)
-        .packetId(satPacketId)
-        .state(StateCode.IN_PROGRESS.name())
-        .lastRequested(ZonedDateTime.now().plusDays(1)).build()
-    );
+    ).thenReturn(packet);
+
+    when(satPcktRepository.save(any())).thenReturn(packet.toBuilder().message("Accepted").build());
 
     when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
         .id(1)
@@ -255,7 +269,10 @@ public class IndividualContributorServiceTest extends TestBase {
     request.setDateStart(dateStart);
 
     Invoices invoices = service.getReceptorInvoices(request);
-    assertThat(invoices.getMessage()).matches(BACKOFF_PATTERN);
+
+    assertThat(invoices.getMessage()).isEqualTo("Accepted");
+    assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
+
   }
 
   /**

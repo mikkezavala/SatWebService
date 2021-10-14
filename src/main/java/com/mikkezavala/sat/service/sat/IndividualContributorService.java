@@ -143,7 +143,10 @@ public class IndividualContributorService {
       invoices = getFromZip(satPacket.getPath(), Invoice.class);
     }
 
-    return builder.satState(StateCode.getCode(satPacket.getState())).invoices(invoices).build();
+    return builder
+        .invoices(invoices)
+        .message(satPacket.getMessage())
+        .satState(StateCode.getCode(satPacket.getState())).build();
   }
 
   private SatToken getToken(String rfc) {
