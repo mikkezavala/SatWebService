@@ -13,4 +13,7 @@ coverage:
     project:
       default:
         threshold: 70%
+<<<<<<< HEAD
 >>>>>>> 25f43cd (codecov thrshold)
+=======
+>>>>>>> ec0be6e (whitespace)
