@@ -1,3 +1,8 @@
 ignore:
   - "src/main/java/com/mikkezavala/sat/domain/**/*"
   - "src/main/java/com/mikkezavala/sat/configuration/**/*"
+
+coverage:
+  precision: 2
+  round: down
+  range: "65...100"
