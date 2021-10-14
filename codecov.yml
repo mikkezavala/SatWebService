@@ -2,6 +2,7 @@ ignore:
   - "src/main/java/com/mikkezavala/sat/domain/**/*"
   - "src/main/java/com/mikkezavala/sat/configuration/**/*"
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 coverage:
   precision: 2
@@ -17,3 +18,10 @@ coverage:
 >>>>>>> 25f43cd (codecov thrshold)
 =======
 >>>>>>> ec0be6e (whitespace)
+=======
+
+coverage:
+  precision: 2
+  round: down
+  range: "65...100"
+>>>>>>> 2d9133b (as docs)
