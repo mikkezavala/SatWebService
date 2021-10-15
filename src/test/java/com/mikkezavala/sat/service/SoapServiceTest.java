@@ -1,20 +1,26 @@
 package com.mikkezavala.sat.service;
 
+import static com.mikkezavala.sat.util.Constant.DEFAULT_REQUEST_TYPE;
 import static com.mikkezavala.sat.util.Constant.FORMATTER;
 import static com.mikkezavala.sat.util.Constant.WSS_SEC_EXT_NS;
 import static com.mikkezavala.sat.util.Constant.WSS_UTILITY_NS;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.xmlunit.assertj3.XmlAssert.assertThat;
 
 import com.mikkezavala.sat.TestBase;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
+import com.mikkezavala.sat.exception.SoapSecurityException;
+import com.mikkezavala.sat.exception.SoapServiceException;
 import com.mikkezavala.sat.repository.SatClientRepository;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +37,8 @@ public class SoapServiceTest extends TestBase {
   @Mock
   private SatClientRepository mockRepository;
 
+  private SoapHandler handler;
+
   private SoapService service;
 
   /**
@@ -41,16 +49,16 @@ public class SoapServiceTest extends TestBase {
   @BeforeEach
   void init() throws FileNotFoundException {
 
-    File pfxFile = loadResource("PF_CFDI/XOJI740919U48.pfx");
+    File pfxFile = loadResource("PF_CFDI/" + RFC_TEST + ".pfx");
     SatClient satClient = new SatClient();
     satClient.setId(1);
-    satClient.setRfc("XOJI740919U48");
+    satClient.setRfc(RFC_TEST);
     satClient.setKeystore(pfxFile.getPath());
     satClient.setPasswordPlain("12345678a");
 
-    SoapHandler handler = new SoapHandler(
+    handler = spy(new SoapHandler(
         getMessageFactory(), getSoapFactory(), getBuilderFactory()
-    );
+    ));
 
     service = new SoapService(handler, mockRepository);
     when(mockRepository.findSatClientByRfc(anyString())).thenReturn(satClient);
@@ -68,7 +76,7 @@ public class SoapServiceTest extends TestBase {
     context.put("o", WSS_SEC_EXT_NS);
     context.put("u", WSS_UTILITY_NS);
 
-    SOAPMessage message = service.autentica("XOJI740919U48");
+    SOAPMessage message = service.auth(RFC_TEST);
 
     String xml = soapToString(message);
     assertThat(xml).withNamespaceContext(context).hasXPath("//s:Envelope");
@@ -90,6 +98,109 @@ public class SoapServiceTest extends TestBase {
   }
 
   /**
+   * Should return soap service exception when auth message invalid.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  public void shouldReturnSoapServiceExceptionWhenAuthMessageInvalid() throws Exception {
+    when(handler.createEnvelope()).thenThrow(SOAPException.class);
+    assertThrows(SoapServiceException.class, () -> service.auth(RFC_TEST));
+  }
+
+  /**
+   * Should return soap service exception when request message invalid.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  public void shouldReturnSoapServiceExceptionWhenRequestMessageInvalid() throws Exception {
+    when(handler.createEnvelope()).thenThrow(SOAPException.class);
+    assertThrows(SoapServiceException.class, () ->
+        service.request(RFC_TEST, ZonedDateTime.now(), ZonedDateTime.now().plusDays(11))
+    );
+  }
+
+  /**
+   * Should return soap service exception when validate message invalid.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  public void shouldReturnSoapServiceExceptionWhenValidateMessageInvalid() throws Exception {
+    when(handler.createEnvelope()).thenThrow(SOAPException.class);
+    assertThrows(SoapServiceException.class, () ->
+        service.validation(UUID.randomUUID().toString(), RFC_TEST)
+    );
+  }
+
+  /**
+   * Should return soap service exception when download message invalid.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  public void shouldReturnSoapServiceExceptionWhenDownloadMessageInvalid() throws Exception {
+    when(handler.createEnvelope()).thenThrow(SOAPException.class);
+    assertThrows(SoapServiceException.class, () ->
+        service.download(UUID.randomUUID().toString(), RFC_TEST)
+    );
+  }
+
+  /**
+   * Should return key store exception when incorrect pass.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  public void shouldReturnKeyStoreExceptionWhenIncorrectPass() throws Exception {
+
+    File pfxFile = loadResource("PF_CFDI/" + RFC_TEST + ".pfx");
+    SatClient satClient = new SatClient();
+    satClient.setId(1);
+    satClient.setRfc(RFC_TEST);
+    satClient.setKeystore(pfxFile.getPath());
+    satClient.setPasswordPlain("55555");
+    when(mockRepository.findSatClientByRfc(anyString())).thenReturn(satClient);
+
+    Throwable throwable = assertThrows(SoapSecurityException.class, () ->
+        service.auth(RFC_TEST)
+    );
+
+    assertThat(throwable.getMessage()).isEqualTo("Unable to decode certificate");
+  }
+
+  /**
+   * Should return key store exception when no key store.
+   */
+  @Test
+  public void shouldReturnKeyStoreExceptionWhenNoKeyStore() {
+
+    when(mockRepository.findSatClientByRfc(anyString())).thenThrow(new RuntimeException());
+
+    Throwable throwable = assertThrows(SoapSecurityException.class, () ->
+        service.validation(UUID.randomUUID().toString(), RFC_TEST)
+    );
+
+    assertThat(throwable.getMessage()).isEqualTo("Unable to create detached signature");
+  }
+
+  /**
+   * Should return certificate encoding exception when cert failed.
+   */
+  @Test
+  public void shouldReturnCertificateEncodingExceptionWhenCertFailed() {
+
+    when(mockRepository.findSatClientByRfc(anyString())).thenThrow(new RuntimeException());
+
+    Throwable throwable = assertThrows(SoapSecurityException.class, () ->
+        service.auth(RFC_TEST)
+    );
+
+    assertThat(throwable.getMessage()).isEqualTo("Unable to decode certificate");
+  }
+
+  /**
    * Should create download request.
    *
    * @throws Exception the exception
@@ -101,7 +212,7 @@ public class SoapServiceTest extends TestBase {
     ZonedDateTime startDateDate = ZonedDateTime.now();
     ZonedDateTime endDate = ZonedDateTime.now().plusDays(2);
 
-    SOAPMessage message = service.solicita("XOJI740919U48", startDateDate, endDate);
+    SOAPMessage message = service.request(RFC_TEST, startDateDate, endDate);
 
     String xml = soapToString(message);
     assertThat(xml).withNamespaceContext(context).hasXPath("//s:Envelope");
@@ -119,13 +230,13 @@ public class SoapServiceTest extends TestBase {
     ).isEqualTo(endDate.format(FORMATTER));
     assertThat(xml).withNamespaceContext(context).valueByXPath(
         "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/@RfcReceptor"
-    ).isEqualTo("XOJI740919U48");
+    ).isEqualTo(RFC_TEST);
     assertThat(xml).withNamespaceContext(context).valueByXPath(
         "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/@RfcSolicitante"
-    ).isEqualTo("XOJI740919U48");
+    ).isEqualTo(RFC_TEST);
     assertThat(xml).withNamespaceContext(context).valueByXPath(
         "//s:Envelope/s:Body/*[local-name()='SolicitaDescarga']/*[local-name()='solicitud']/@TipoSolicitud"
-    ).isEqualTo("CFDI");
+    ).isEqualTo(DEFAULT_REQUEST_TYPE);
   }
 
   /**
@@ -139,7 +250,7 @@ public class SoapServiceTest extends TestBase {
     Map<String, String> context = getNSContext();
 
     String uuid = UUID.randomUUID().toString();
-    SOAPMessage message = service.valida(uuid, "XOJI740919U48");
+    SOAPMessage message = service.validation(uuid, RFC_TEST);
 
     String xml = soapToString(message);
     assertThat(xml).withNamespaceContext(context).hasXPath("//s:Envelope");
@@ -154,7 +265,7 @@ public class SoapServiceTest extends TestBase {
     ).isEqualTo(uuid);
     assertThat(xml).withNamespaceContext(context).valueByXPath(
         "//s:Envelope/s:Body/*[local-name()='VerificaSolicitudDescarga']/*[local-name()='solicitud']/@RfcSolicitante"
-    ).isEqualTo("XOJI740919U48");
+    ).isEqualTo(RFC_TEST);
   }
 
   /**
@@ -168,7 +279,7 @@ public class SoapServiceTest extends TestBase {
     Map<String, String> context = getNSContext();
 
     String uuid = UUID.randomUUID().toString();
-    SOAPMessage message = service.descarga(uuid, "XOJI740919U48");
+    SOAPMessage message = service.download(uuid, RFC_TEST);
 
     String xml = soapToString(message);
     assertThat(xml).withNamespaceContext(context).hasXPath("//s:Envelope");
@@ -183,6 +294,6 @@ public class SoapServiceTest extends TestBase {
     ).isEqualTo(uuid);
     assertThat(xml).withNamespaceContext(context).valueByXPath(
         "//s:Envelope/s:Body/*[local-name()='PeticionDescargaMasivaTercerosEntrada']/*[local-name()='peticionDescarga']/@RfcSolicitante"
-    ).isEqualTo("XOJI740919U48");
+    ).isEqualTo(RFC_TEST);
   }
 }
