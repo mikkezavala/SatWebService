@@ -15,12 +15,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Element;
 
+/**
+ * The type Soap handler test.
+ */
 public class SoapHandlerTest extends TestBase {
 
   private SoapHandler handler;
 
   private SOAPFactory soapFactory = spy(getSoapFactory());
 
+  /**
+   * Init.
+   */
   @BeforeEach
   void init() {
 
@@ -30,6 +36,11 @@ public class SoapHandlerTest extends TestBase {
     );
   }
 
+  /**
+   * Should throw soap parsing exception when invalid.
+   *
+   * @throws SOAPException the soap exception
+   */
   @Test
   public void shouldThrowSoapParsingExceptionWhenInvalid() throws SOAPException {
     when(soapFactory.createElement(any(Element.class))).thenThrow(RuntimeException.class);
