@@ -1,9 +1,11 @@
 FROM amazoncorretto:17-alpine
 
+RUN apk upgrade --update-cache --available && apk add openssl && rm -rf /var/cache/apk/*
+
 ARG JAR_FILE=target/sat-web-service.jar
 
 COPY ${JAR_FILE} sat-web-service.jar
 
-COPY target/classes/TEST.pfx TEST.pfx
+COPY ./create-pfx.sh ./create-pfx.sh
 
 ENTRYPOINT ["java","-jar", "-Dspring.profiles.active=docker", "/sat-web-service.jar"]
