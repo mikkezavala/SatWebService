@@ -1,5 +1,6 @@
 package com.mikkezavala.sat.util;
 
+import java.nio.file.Path;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.slf4j.Logger;
@@ -10,19 +11,27 @@ import org.slf4j.LoggerFactory;
  */
 public class FielUtil {
 
+  private static final String COMMAND_PLACEHOLDER = "./create-pfx.sh -r %s -c %s -k %s -p %s";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(FielUtil.class);
 
   /**
-   * Run script int.
+   * Generate pfx int.
    *
-   * @param command the command
+   * @param rfc  the rfc
+   * @param cert the cert
+   * @param key  the key
+   * @param pass the pass
    * @return the int
    */
-  public static int runScript(String command) {
+  public static int generatePFX(String rfc, Path cert, Path key, String pass) {
+
+    String command = String.format(COMMAND_PLACEHOLDER, rfc, cert, key, pass);
+
     LOGGER.info("Generating PFX");
     CommandLine cmd = CommandLine.parse(command);
     DefaultExecutor exec = new DefaultExecutor();
-    exec.setExitValue(0);
+
     try {
       return exec.execute(cmd);
     } catch (Exception e) {

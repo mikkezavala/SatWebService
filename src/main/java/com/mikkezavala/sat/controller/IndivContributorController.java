@@ -1,7 +1,7 @@
 package com.mikkezavala.sat.controller;
 
 import static com.mikkezavala.sat.util.Constant.KEY_STORE;
-import static com.mikkezavala.sat.util.FielUtil.runScript;
+import static com.mikkezavala.sat.util.FielUtil.generatePFX;
 
 import com.mikkezavala.sat.domain.client.registered.RequestCfdi;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.Invoices;
@@ -93,11 +93,7 @@ public class IndivContributorController {
       Path certLoc = keyStorePath.resolve(rfc).resolve(uuid + "-cert.cer");
       FileUtils.writeByteArrayToFile(certLoc.toFile(), certFile.getBytes());
 
-      String command = String.format(
-          "./create-pfx.sh -r %s -c %s -k %s -p %s", rfc, certLoc, keyLoc, pass
-      );
-
-      int exitCode = runScript(command);
+      int exitCode = generatePFX(rfc, certLoc, keyLoc, pass);
       Path tmpDir = keyStorePath.resolve(rfc);
       FileUtils.forceDelete(tmpDir.toFile());
 
