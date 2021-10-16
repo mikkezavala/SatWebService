@@ -3,6 +3,7 @@ package com.mikkezavala.sat.controller;
 import static com.mikkezavala.sat.util.Constant.FORMATTER;
 import static com.mikkezavala.sat.util.Constant.KEY_STORE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -99,9 +100,42 @@ public class IndivContributorControllerTest extends TestBase {
     );
 
     Map<String, String> res = controller.handleFileUpload(key, cert, RFC_TEST, RFC_TEST_PASS);
+    assertThat(res.get("message")).isEqualTo("Keystore created for " + RFC_TEST);
+  }
 
-    assertThat(res.get("message")).isEqualTo("Keystore created for XOJI740919U48");
+  @Test
+  public void shouldFailedCreateKeyStore() throws Exception {
+    String keyStore = KEY_STORE + RFC_TEST + ".pfx";
+    SatClient client = new SatClient()
+        .id(null)
+        .rfc(RFC_TEST)
+        .keystore(keyStore)
+        .passwordPlain(RFC_TEST_PASS);
 
+    doNothing().when(satClientRepository).deleteAllByRfc(anyString());
+    when(satClientRepository.save(any(SatClient.class))).thenReturn(client);
+
+    File keyFile = loadResource("PF_CFDI/" + RFC_TEST + ".key");
+    MockMultipartFile key = new MockMultipartFile(
+        "file-key",
+        keyFile.getName(),
+        MediaType.APPLICATION_OCTET_STREAM_VALUE,
+        new FileInputStream(keyFile)
+    );
+
+    File certFile = loadResource("PF_CFDI/" + RFC_TEST + ".cer");
+    MockMultipartFile cert = new MockMultipartFile(
+        "file-cert",
+        certFile.getName(),
+        MediaType.APPLICATION_OCTET_STREAM_VALUE,
+        new FileInputStream(certFile)
+    );
+
+    Throwable throwable = assertThrows(RuntimeException.class, () ->
+        controller.handleFileUpload(key, cert, RFC_TEST, RFC_TEST_PASS)
+    );
+
+    assertThat(throwable.getMessage()).isEqualTo("Failed creating KeyStore");
   }
 
   private Invoices buildMockInvoices() {
