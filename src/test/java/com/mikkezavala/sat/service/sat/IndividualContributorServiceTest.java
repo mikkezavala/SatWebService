@@ -230,11 +230,11 @@ public class IndividualContributorServiceTest extends TestBase {
 
     SatPacket packet = SatPacket.builder()
         .rfc(RFC_TEST)
-        .timesRequested(1)
+        .timesRequested(6)
         .requestId(requestId)
         .packetId(satPacketId)
         .state(StateCode.IN_PROGRESS.name())
-        .lastRequested(ZonedDateTime.now().minusSeconds(1)).build();
+        .lastRequested(ZonedDateTime.now().plusHours(2)).build();
 
     when(soapUtil.callWebService(
         any(), any(), eq(VALIDA_DESCARGA),
@@ -268,8 +268,8 @@ public class IndividualContributorServiceTest extends TestBase {
 
     Invoices invoices = service.getReceptorInvoices(request);
 
-    assertThat(invoices.getMessage()).isEqualTo("Accepted");
     assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
+    assertThat(invoices.getMessage()).contains("Backing off validation request. Wait time:");
 
   }
 

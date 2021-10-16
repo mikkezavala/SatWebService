@@ -146,7 +146,6 @@ public class IndivContributorService {
 
     return builder
         .invoices(invoices)
-        .message(satPacket.getMessage())
         .satState(StateCode.getCode(satPacket.getState())).build();
   }
 
