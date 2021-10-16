@@ -5,4 +5,4 @@ ignore:
 coverage:
   precision: 2
   round: down
-  range: "65...100"
+  range: "65...80"
