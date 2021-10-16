@@ -172,6 +172,33 @@ public class IndivContributorControllerTest extends TestBase {
     assertThat(throwable.getMessage()).isEqualTo("Failed handleFileUpload");
   }
 
+  @Test
+  public void shouldFailedWhenPFXCreatingFailed() throws Exception {
+    FileUtils.forceDelete(Path.of(KEY_STORE).toFile());
+    doNothing().when(satClientRepository).deleteAllByRfc(anyString());
+    doThrow(FielFileException.class).when(satClientRepository).save(any(SatClient.class));
+
+    File keyFile = loadResource("PF_CFDI/" + RFC_TEST + ".key");
+    MockMultipartFile key = new MockMultipartFile(
+        "file-key",
+        keyFile.getName(),
+        MediaType.APPLICATION_OCTET_STREAM_VALUE,
+        new FileInputStream(keyFile)
+    );
+
+    File certFile = loadResource("PF_CFDI/" + RFC_TEST + ".cer");
+    MockMultipartFile cert = new MockMultipartFile(
+        "file-cert",
+        certFile.getName(),
+        MediaType.APPLICATION_OCTET_STREAM_VALUE,
+        new FileInputStream(certFile)
+    );
+
+    Map<String, String> error = controller.handleFileUpload(key, cert, RFC_TEST, "WRONG");
+
+    assertThat(error.get("error")).isEqualTo("Keystore failed for " + RFC_TEST);
+  }
+
   private Invoices buildMockInvoices() {
     Invoice invoice = new Invoice().complement(
             new Complemento().payments(new Payments().payment(

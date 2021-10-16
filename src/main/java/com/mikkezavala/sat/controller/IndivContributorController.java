@@ -107,8 +107,12 @@ public class IndivContributorController {
         if (Objects.isNull(key.id())) {
           throw new FielException("Failed creating KeyStore");
         }
+
+        return Collections.singletonMap("message", String.format("Keystore created for %s", rfc));
       }
-      return Collections.singletonMap("message", String.format("Keystore created for %s", rfc));
+
+      return Collections.singletonMap("error", String.format("Keystore failed for %s", rfc));
+
     } catch (FielFileException | IOException e) {
       throw new FielException("Failed handleFileUpload", e);
     }
