@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.mikkezavala.sat.TestBase;
@@ -20,6 +21,8 @@ import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Payment;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Payments;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Receptor;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.validate.StateCode;
+import com.mikkezavala.sat.exception.FielException;
+import com.mikkezavala.sat.exception.FielFileException;
 import com.mikkezavala.sat.repository.SatClientRepository;
 import com.mikkezavala.sat.service.sat.IndivContributorService;
 import java.io.File;
@@ -136,6 +139,34 @@ public class IndivContributorControllerTest extends TestBase {
     );
 
     assertThat(throwable.getMessage()).isEqualTo("Failed creating KeyStore");
+  }
+
+  @Test
+  public void shouldFailedSSCreateKeyStore() throws Exception {
+    doNothing().when(satClientRepository).deleteAllByRfc(anyString());
+    doThrow(FielFileException.class).when(satClientRepository).save(any(SatClient.class));
+
+    File keyFile = loadResource("PF_CFDI/" + RFC_TEST + ".key");
+    MockMultipartFile key = new MockMultipartFile(
+        "file-key",
+        keyFile.getName(),
+        MediaType.APPLICATION_OCTET_STREAM_VALUE,
+        new FileInputStream(keyFile)
+    );
+
+    File certFile = loadResource("PF_CFDI/" + RFC_TEST + ".cer");
+    MockMultipartFile cert = new MockMultipartFile(
+        "file-cert",
+        certFile.getName(),
+        MediaType.APPLICATION_OCTET_STREAM_VALUE,
+        new FileInputStream(certFile)
+    );
+
+    Throwable throwable = assertThrows(FielException.class, () ->
+        controller.handleFileUpload(key, cert, RFC_TEST, RFC_TEST_PASS)
+    );
+
+    assertThat(throwable.getMessage()).isEqualTo("Failed handleFileUpload");
   }
 
   private Invoices buildMockInvoices() {

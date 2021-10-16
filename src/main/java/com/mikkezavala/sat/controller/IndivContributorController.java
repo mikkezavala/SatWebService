@@ -6,6 +6,8 @@ import static com.mikkezavala.sat.util.FielUtil.runScript;
 import com.mikkezavala.sat.domain.client.registered.RequestCfdi;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.Invoices;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
+import com.mikkezavala.sat.exception.FielException;
+import com.mikkezavala.sat.exception.FielFileException;
 import com.mikkezavala.sat.repository.SatClientRepository;
 import com.mikkezavala.sat.service.sat.IndivContributorService;
 import java.io.File;
@@ -99,12 +101,12 @@ public class IndivContributorController {
       if (exitCode == 0) {
         SatClient key = saveKey(rfc, pass);
         if (Objects.isNull(key.id())) {
-          throw new RuntimeException("Failed creating KeyStore");
+          throw new FielException("Failed creating KeyStore");
         }
       }
       return Collections.singletonMap("message", String.format("Keystore created for %s", rfc));
-    } catch (IOException e) {
-      throw new RuntimeException("Failed handleFileUpload", e);
+    } catch (FielFileException | IOException e) {
+      throw new FielException("Failed handleFileUpload", e);
     }
 
   }
@@ -116,20 +118,26 @@ public class IndivContributorController {
    * @param pass the pass
    * @return the sat client
    */
-  public SatClient saveKey(String rfc, String pass) throws IOException {
-    SatClient satClient = new SatClient();
+  public SatClient saveKey(String rfc, String pass) {
 
-    if (!FileUtils.isDirectory(new File(KEY_STORE))) {
-      FileUtils.forceMkdir(new File(KEY_STORE));
+    try {
+
+      SatClient satClient = new SatClient();
+
+      if (!FileUtils.isDirectory(new File(KEY_STORE))) {
+        FileUtils.forceMkdir(new File(KEY_STORE));
+      }
+
+      File keyFile = (new File(KEY_STORE + rfc + ".pfx"));
+
+      satClient.keystore(keyFile.getAbsolutePath());
+      satClient.passwordPlain(pass);
+      satClient.rfc(rfc);
+      satClientRepository.deleteAllByRfc(rfc);
+      return satClientRepository.save(satClient);
+    }catch (Exception e) {
+      throw new FielFileException("Failed Saving keystore", e);
     }
-
-    File keyFile = (new File(KEY_STORE + rfc + ".pfx"));
-
-    satClient.keystore(keyFile.getAbsolutePath());
-    satClient.passwordPlain(pass);
-    satClient.rfc(rfc);
-    satClientRepository.deleteAllByRfc(rfc);
-    return satClientRepository.save(satClient);
   }
 
 }
