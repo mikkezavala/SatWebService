@@ -5,6 +5,7 @@ import static com.mikkezavala.sat.domain.sat.SoapEndpoint.DESCARGA_MASIVA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.SOLICITA_DESCARGA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.VALIDA_DESCARGA;
 import static com.mikkezavala.sat.domain.sat.cfdi.individual.validate.StateCode.READY;
+import static com.mikkezavala.sat.util.Constant.TIME_ZONE;
 import static com.mikkezavala.sat.util.ResourceUtil.getFromZip;
 import static com.mikkezavala.sat.util.ResourceUtil.saveZip;
 
@@ -38,7 +39,7 @@ import org.springframework.stereotype.Service;
  * The type Individual contributor service.
  */
 @Service
-public class IndividualContributorService {
+public class IndivContributorService {
 
 
   private final SoapUtil soapUtil;
@@ -51,7 +52,7 @@ public class IndividualContributorService {
 
   private static final int BACKOFF_TIME = 240;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(IndividualContributorService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndivContributorService.class);
 
   /**
    * Instantiates a new Individual contributor service.
@@ -61,7 +62,7 @@ public class IndividualContributorService {
    * @param repository          the repository
    * @param satPacketRepository the sat packet repository
    */
-  public IndividualContributorService(
+  public IndivContributorService(
       SoapUtil soapUtil,
       SoapService service,
       SatTokenRepository repository,
@@ -103,7 +104,7 @@ public class IndividualContributorService {
 
       if (!StateCode.equals(satPacket.getState(), READY)) {
         Duration delta = Duration.between(
-            satPacket.getLastRequested().withZoneSameLocal(ZoneId.of("UTC")),
+            satPacket.getLastRequested().withZoneSameLocal(ZoneId.of(TIME_ZONE)),
             ZonedDateTime.now()
         );
         long waitTime = BACKOFF_TIME - delta.toMinutes();
@@ -145,14 +146,13 @@ public class IndividualContributorService {
 
     return builder
         .invoices(invoices)
-        .message(satPacket.getMessage())
         .satState(StateCode.getCode(satPacket.getState())).build();
   }
 
   private SatToken getToken(String rfc) {
     try {
       AuthResponse response = soapUtil.callWebService(
-          service.autentica(rfc), AuthResponse.class, AUTENTICA, null
+          service.auth(rfc), AuthResponse.class, AUTENTICA, null
       );
       ZonedDateTime tokenTo = response.getTimestamp().getExpires();
       Duration tokenValidity = Duration.between(ZonedDateTime.now(), tokenTo);
@@ -173,7 +173,7 @@ public class IndividualContributorService {
     try {
       String rfc = request.getRfc();
       return soapUtil.callWebService(
-          service.solicita(rfc, request.getDateStart(), request.getDateEnd()), Response.class,
+          service.request(rfc, request.getDateStart(), request.getDateEnd()), Response.class,
           SOLICITA_DESCARGA, token.getToken());
     } catch (Exception e) {
       LOGGER.error("failed creating request", e);
@@ -192,7 +192,7 @@ public class IndividualContributorService {
 
       LOGGER.info("Token Valid for (in validateRequest): {} seconds", tokenValidity.getSeconds());
       ValidateResponse response = soapUtil.callWebService(
-          service.valida(requestId, rfc
+          service.validation(requestId, rfc
           ), ValidateResponse.class, VALIDA_DESCARGA, runtimeToken
       );
 
@@ -226,7 +226,7 @@ public class IndividualContributorService {
 
       LOGGER.info("Token Valid for (in validateRequest): {} seconds", tokenValidity.getSeconds());
       ValidateResponse response = soapUtil.callWebService(
-          service.valida(packet.getRequestId(), packet.getRfc()
+          service.validation(packet.getRequestId(), packet.getRfc()
           ), ValidateResponse.class, VALIDA_DESCARGA, runtimeToken
       );
 
@@ -252,7 +252,7 @@ public class IndividualContributorService {
       String packedId = satPacket.getPacketId();
       String uuid = String.format("%s_%s", rfc, packedId);
       DownloadResponse out = soapUtil.callWebService(
-          service.descarga(packedId, rfc), DownloadResponse.class, DESCARGA_MASIVA, token.getToken()
+          service.download(packedId, rfc), DownloadResponse.class, DESCARGA_MASIVA, token.getToken()
       );
 
       String zip = saveZip(out.getPaquete(), uuid);

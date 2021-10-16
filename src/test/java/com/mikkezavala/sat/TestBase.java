@@ -30,6 +30,8 @@ import org.xml.sax.InputSource;
 
 abstract public class TestBase {
 
+  protected final String RFC_TEST = "XOJI740919U48";
+
   protected Map<String, String> getNSContext() {
     Map<String, String> ns = new HashMap<>();
     ns.put("s", ENVELOPE_NS);

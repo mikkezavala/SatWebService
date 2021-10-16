@@ -63,9 +63,7 @@ public class IndividualContributorServiceTest extends TestBase {
 
   private SatToken token;
 
-  private IndividualContributorService service;
-
-  private static final String RFC_CUSTOMER = "XOJI740919U48";
+  private IndivContributorService service;
 
   private static final Pattern BACKOFF_PATTERN = Pattern.compile(
       "Backing off validation request\\. Wait time: \\d+ minutes");
@@ -78,10 +76,10 @@ public class IndividualContributorServiceTest extends TestBase {
   @BeforeEach
   void init() throws Exception {
 
-    File pfxFile = loadResource("PF_CFDI/XOJI740919U48.pfx");
+    File pfxFile = loadResource("PF_CFDI/" + RFC_TEST + ".pfx");
     SatClient satClient = new SatClient();
     satClient.setId(1);
-    satClient.setRfc(RFC_CUSTOMER);
+    satClient.setRfc(RFC_TEST);
     satClient.setKeystore(pfxFile.getPath());
     satClient.setPasswordPlain("12345678a");
 
@@ -126,7 +124,7 @@ public class IndividualContributorServiceTest extends TestBase {
     );
 
     SoapService soapService = new SoapService(handler, satClientRepository);
-    service = new IndividualContributorService(
+    service = new IndivContributorService(
         soapUtil, soapService, satTokenRepository, satPcktRepository
     );
   }
@@ -162,7 +160,7 @@ public class IndividualContributorServiceTest extends TestBase {
 
     ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
     ZonedDateTime dateStart = dateEnd.minusDays(5);
-    request.setRfc(RFC_CUSTOMER);
+    request.setRfc(RFC_TEST);
     request.setDateEnd(dateEnd);
     request.setDateStart(dateStart);
 
@@ -190,7 +188,7 @@ public class IndividualContributorServiceTest extends TestBase {
     when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
         anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
     ).thenReturn(SatPacket.builder()
-        .rfc(RFC_CUSTOMER)
+        .rfc(RFC_TEST)
         .requestId(requestId)
         .timesRequested(1)
         .packetId(satPacketId)
@@ -200,7 +198,7 @@ public class IndividualContributorServiceTest extends TestBase {
 
     when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
         .id(1)
-        .rfc(RFC_CUSTOMER)
+        .rfc(RFC_TEST)
         .token("fakeToken")
         .created(ZonedDateTime.now().minusMinutes(3))
         .expiration(ZonedDateTime.now().minusMinutes(5)).build()
@@ -208,7 +206,7 @@ public class IndividualContributorServiceTest extends TestBase {
 
     ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
     ZonedDateTime dateStart = dateEnd.minusDays(5);
-    request.setRfc(RFC_CUSTOMER);
+    request.setRfc(RFC_TEST);
     request.setDateEnd(dateEnd);
     request.setDateStart(dateStart);
 
@@ -216,6 +214,11 @@ public class IndividualContributorServiceTest extends TestBase {
     assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
   }
 
+  /**
+   * Should validate request backoff.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldValidateRequestBackoff() throws Exception {
     RequestCfdi request = new RequestCfdi();
@@ -231,12 +234,12 @@ public class IndividualContributorServiceTest extends TestBase {
     validation.setResult(validationResult);
 
     SatPacket packet = SatPacket.builder()
-        .rfc(RFC_CUSTOMER)
-        .timesRequested(1)
+        .rfc(RFC_TEST)
+        .timesRequested(6)
         .requestId(requestId)
         .packetId(satPacketId)
         .state(StateCode.IN_PROGRESS.name())
-        .lastRequested(ZonedDateTime.now().minusSeconds(1)).build();
+        .lastRequested(ZonedDateTime.now().plusHours(2)).build();
 
     when(soapUtil.callWebService(
         any(), any(), eq(VALIDA_DESCARGA),
@@ -256,7 +259,7 @@ public class IndividualContributorServiceTest extends TestBase {
 
     when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
         .id(1)
-        .rfc(RFC_CUSTOMER)
+        .rfc(RFC_TEST)
         .token("fakeToken")
         .created(ZonedDateTime.now().minusMinutes(3))
         .expiration(ZonedDateTime.now().minusMinutes(5)).build()
@@ -264,14 +267,14 @@ public class IndividualContributorServiceTest extends TestBase {
 
     ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
     ZonedDateTime dateStart = dateEnd.minusDays(5);
-    request.setRfc(RFC_CUSTOMER);
+    request.setRfc(RFC_TEST);
     request.setDateEnd(dateEnd);
     request.setDateStart(dateStart);
 
     Invoices invoices = service.getReceptorInvoices(request);
 
-    assertThat(invoices.getMessage()).isEqualTo("Accepted");
     assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
+    assertThat(invoices.getMessage()).contains("Backing off validation request. Wait time:");
 
   }
 
@@ -301,7 +304,7 @@ public class IndividualContributorServiceTest extends TestBase {
     validation.setResult(validationResult);
 
     SatPacket satPacket = SatPacket.builder()
-        .rfc(RFC_CUSTOMER)
+        .rfc(RFC_TEST)
         .timesRequested(1)
         .requestId(requestId)
         .packetId(satPacketId)
@@ -321,20 +324,20 @@ public class IndividualContributorServiceTest extends TestBase {
     )).thenReturn(downloadResponse);
 
     SatPacket updated = satPacket.toBuilder()
-        .path(String.format("./zip/%s_%s.zip", RFC_CUSTOMER, satPacketId)).build();
+        .path(String.format("./zip/%s_%s.zip", RFC_TEST, satPacketId)).build();
 
     when(satPcktRepository.save(any(SatPacket.class))).thenReturn(updated);
     when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
         .id(1)
         .token("fakeToken")
-        .rfc(RFC_CUSTOMER)
+        .rfc(RFC_TEST)
         .expiration(now.minusMinutes(5))
         .created(ZonedDateTime.now().minusMinutes(3)).build()
     );
 
     ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
     ZonedDateTime dateStart = dateEnd.minusDays(5);
-    request.setRfc(RFC_CUSTOMER);
+    request.setRfc(RFC_TEST);
     request.setDateEnd(dateEnd);
     request.setDateStart(dateStart);
 
@@ -342,11 +345,80 @@ public class IndividualContributorServiceTest extends TestBase {
     assertThat(invoices.getSatState()).isEqualTo(StateCode.READY);
 
     Invoice invoice = invoices.getInvoices().get(0);
-    assertThat(invoice.getFolio()).isEqualTo("2052571552");
-    assertThat(invoice.getIssuer().getRfc()).isEqualTo("BBA830831LJ2");
-    assertThat(invoice.getReceptor().getRfc()).isEqualTo("XXXX8503016C3");
-    assertThat(invoice.getConcepts().getConcept().get(0).getAmount()).isEqualTo(1.0);
-    assertThat(invoice.getConcepts().getConcept().get(0).getServiceCode()).isEqualTo("92356500");
+    assertThat(invoice.folio()).isEqualTo("2052571552");
+    assertThat(invoice.issuer().rfc()).isEqualTo("BBA830831LJ2");
+    assertThat(invoice.receptor().rfc()).isEqualTo("XXXX8503016C3");
+    assertThat(invoice.concepts().getConcept().get(0).getAmount()).isEqualTo(1.0);
+    assertThat(invoice.concepts().getConcept().get(0).getServiceCode()).isEqualTo("92356500");
+  }
+
+  @Test
+  public void shouldReturnHappyPath() throws Exception {
+    RequestCfdi request = new RequestCfdi();
+    ZonedDateTime now = ZonedDateTime.now();
+
+    DownloadResponse downloadResponse = new DownloadResponse();
+    downloadResponse.setPaquete(extractFile("demo.zip"));
+
+    String requestId = UUID.randomUUID().toString();
+    String satPacketId = UUID.randomUUID().toString();
+
+    ValidateResponse validation = new ValidateResponse();
+    ValidateResult validationResult = new ValidateResult();
+
+    validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
+    validationResult.setState(StateCode.READY);
+    validationResult.setStatus("5000");
+    validationResult.setCfdiCount(5);
+    validation.setResult(validationResult);
+
+    SatPacket satPacket = SatPacket.builder()
+        .rfc(RFC_TEST)
+        .timesRequested(1)
+        .requestId(requestId)
+        .packetId(satPacketId)
+        .state(StateCode.READY.name()).build();
+
+    when(soapUtil.callWebService(
+        any(), any(), eq(VALIDA_DESCARGA),
+        anyString())
+    ).thenReturn(validation);
+
+    when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
+        anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
+    ).thenReturn(null);
+
+    when(soapUtil.callWebService(
+        any(), any(), eq(DESCARGA_MASIVA), anyString()
+    )).thenReturn(downloadResponse);
+
+    SatPacket updated = satPacket.toBuilder()
+        .path(String.format("./zip/%s_%s.zip", RFC_TEST, satPacketId)).build();
+
+    when(satPcktRepository.save(any(SatPacket.class))).thenReturn(updated);
+    when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
+        .id(1)
+        .token("fakeToken")
+        .rfc(RFC_TEST)
+        .expiration(now.minusMinutes(5))
+        .created(ZonedDateTime.now().minusMinutes(3)).build()
+    );
+
+    ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
+    ZonedDateTime dateStart = dateEnd.minusDays(5);
+    request.setRfc(RFC_TEST);
+    request.setDateEnd(dateEnd);
+    request.setDateStart(dateStart);
+
+    Invoices invoices = service.getReceptorInvoices(request);
+    assertThat(invoices.getSatState()).isEqualTo(StateCode.READY);
+
+    Invoice invoice = invoices.getInvoices().get(0);
+    assertThat(invoice.folio()).isEqualTo("2052571552");
+    assertThat(invoice.issuer().rfc()).isEqualTo("BBA830831LJ2");
+    assertThat(invoice.receptor().rfc()).isEqualTo("XXXX8503016C3");
+    assertThat(invoice.concepts().getConcept().get(0).getAmount()).isEqualTo(1.0);
+    assertThat(invoice.concepts().getConcept().get(0).getServiceCode()).isEqualTo("92356500");
   }
 
 }

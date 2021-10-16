@@ -35,6 +35,9 @@ public enum StateCode {
    */
   @XmlEnumValue("6") EXPIRED;
 
+  /**
+   * Cache ENUM, be nice with memory and VM
+   */
   private static final Map<String, StateCode> ITEMS = new HashMap<>();
 
   static {
