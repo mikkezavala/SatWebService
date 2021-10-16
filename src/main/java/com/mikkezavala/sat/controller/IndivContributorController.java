@@ -86,6 +86,11 @@ public class IndivContributorController {
     try {
       String uuid = UUID.randomUUID().toString();
       Path keyStorePath = Path.of(KEY_STORE);
+
+      if(!keyStorePath.toFile().exists()) {
+        FileUtils.forceMkdir(keyStorePath.toFile());
+      }
+
       Path keyLoc = keyStorePath.resolve(rfc).resolve(uuid + "-key.key");
 
       FileUtils.writeByteArrayToFile(keyLoc.toFile(), keyFile.getBytes());
