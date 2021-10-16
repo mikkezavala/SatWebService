@@ -27,10 +27,12 @@ import com.mikkezavala.sat.repository.SatClientRepository;
 import com.mikkezavala.sat.service.sat.IndivContributorService;
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -142,7 +144,8 @@ public class IndivContributorControllerTest extends TestBase {
   }
 
   @Test
-  public void shouldFailedSSCreateKeyStore() throws Exception {
+  public void shouldFailedSavingPath() throws Exception {
+    FileUtils.forceDelete(Path.of(KEY_STORE).toFile());
     doNothing().when(satClientRepository).deleteAllByRfc(anyString());
     doThrow(FielFileException.class).when(satClientRepository).save(any(SatClient.class));
 

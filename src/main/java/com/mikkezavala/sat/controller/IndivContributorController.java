@@ -12,6 +12,7 @@ import com.mikkezavala.sat.repository.SatClientRepository;
 import com.mikkezavala.sat.service.sat.IndivContributorService;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -84,19 +85,21 @@ public class IndivContributorController {
 
     try {
       String uuid = UUID.randomUUID().toString();
+      Path keyStorePath = Path.of(KEY_STORE);
+      Path keyLoc = keyStorePath.resolve(rfc).resolve(uuid + "-key.key");
 
-      String keyLoc = KEY_STORE + rfc + "/" + uuid + "-key.key";
-      FileUtils.writeByteArrayToFile(new File(keyLoc), keyFile.getBytes());
+      FileUtils.writeByteArrayToFile(keyLoc.toFile(), keyFile.getBytes());
 
-      String certLoc = KEY_STORE + rfc + "/" + uuid + "-cert.cer";
-      FileUtils.writeByteArrayToFile(new File(certLoc), certFile.getBytes());
+      Path certLoc = keyStorePath.resolve(rfc).resolve(uuid + "-cert.cer");
+      FileUtils.writeByteArrayToFile(certLoc.toFile(), certFile.getBytes());
 
       String command = String.format(
           "./create-pfx.sh -r %s -c %s -k %s -p %s", rfc, certLoc, keyLoc, pass
       );
 
       int exitCode = runScript(command);
-      FileUtils.forceDelete(new File(KEY_STORE + rfc));
+      Path tmpDir = keyStorePath.resolve(rfc);
+      FileUtils.forceDelete(tmpDir.toFile());
 
       if (exitCode == 0) {
         SatClient key = saveKey(rfc, pass);
@@ -123,11 +126,6 @@ public class IndivContributorController {
     try {
 
       SatClient satClient = new SatClient();
-
-      if (!FileUtils.isDirectory(new File(KEY_STORE))) {
-        FileUtils.forceMkdir(new File(KEY_STORE));
-      }
-
       File keyFile = (new File(KEY_STORE + rfc + ".pfx"));
 
       satClient.keystore(keyFile.getAbsolutePath());
