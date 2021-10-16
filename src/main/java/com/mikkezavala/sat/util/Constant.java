@@ -10,6 +10,8 @@ public class Constant {
 
   public final static String DEFAULT_REQUEST_TYPE = "CFDI";
 
+  public final static String KEY_STORE = "./keystore/";
+
   public final static String DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
 
   public final static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);

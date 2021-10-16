@@ -6,3 +6,4 @@ target
 **/.DS_Store
 mysql-data
 zip
+keystore

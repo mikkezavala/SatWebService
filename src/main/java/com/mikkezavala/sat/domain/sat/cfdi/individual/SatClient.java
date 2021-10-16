@@ -6,9 +6,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @Entity
+@Accessors(fluent = true)
 public class SatClient {
 
   @Id

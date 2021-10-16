@@ -331,7 +331,7 @@ public class SoapService {
   private PrivateKey getKeyFormCert(String rfc) {
     try {
       SatClient client = repository.findSatClientByRfc(rfc);
-      return (PrivateKey) getKeyStore(client).getKey("1", client.getPasswordPlain().toCharArray());
+      return (PrivateKey) getKeyStore(client).getKey("1", client.passwordPlain().toCharArray());
     } catch (Exception e) {
       throw new SatKeyStoreException("Unable to retrieve key from keyStore", e);
     }
@@ -340,10 +340,10 @@ public class SoapService {
   private KeyStore getKeyStore(SatClient client) {
 
     try {
-      Resource cert = new FileSystemResource(client.getKeystore());
+      Resource cert = new FileSystemResource(client.keystore());
 
       KeyStore keystore = KeyStore.getInstance("PKCS12");
-      keystore.load(cert.getInputStream(), client.getPasswordPlain().toCharArray());
+      keystore.load(cert.getInputStream(), client.passwordPlain().toCharArray());
 
       return keystore;
     } catch (Exception e) {

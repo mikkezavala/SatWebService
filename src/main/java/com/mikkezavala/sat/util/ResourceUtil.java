@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  */
 public class ResourceUtil {
 
-  private static final String ZIP_PREFIX = "./zip/";
+  public static final String ZIP_PREFIX = "./zip/";
 
   private static final DocumentBuilderFactory DOC_FACTORY = DocumentBuilderFactory.newInstance();
 
@@ -83,7 +83,7 @@ public class ResourceUtil {
     }
 
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
-    List<T> invoices = new ArrayList<>();
+    List<T> elements = new ArrayList<>();
     while (entries.hasMoreElements()) {
       ZipEntry entry = entries.nextElement();
       try (InputStream stream = zipFile.getInputStream(entry)) {
@@ -94,13 +94,13 @@ public class ResourceUtil {
         JAXBContext context = JAXBContext.newInstance(clazz);
         JAXBElement<T> content = context.createUnmarshaller().unmarshal(doc, clazz);
 
-        invoices.add(content.getValue());
+        elements.add(content.getValue());
       } catch (IOException | SAXException | JAXBException | ParserConfigurationException e) {
         LOGGER.error("Failed parsing zip file into List<{}>", className);
       }
     }
 
-    return invoices;
+    return elements;
   }
 
 }

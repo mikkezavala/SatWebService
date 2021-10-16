@@ -32,6 +32,8 @@ abstract public class TestBase {
 
   protected final String RFC_TEST = "XOJI740919U48";
 
+  protected final String RFC_TEST_PASS = "12345678a";
+
   protected Map<String, String> getNSContext() {
     Map<String, String> ns = new HashMap<>();
     ns.put("s", ENVELOPE_NS);
