@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
  * The type Individual contributor service.
  */
 @Service
-public class IndividualContributorService {
+public class IndivContributorService {
 
 
   private final SoapUtil soapUtil;
@@ -52,7 +52,7 @@ public class IndividualContributorService {
 
   private static final int BACKOFF_TIME = 240;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(IndividualContributorService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndivContributorService.class);
 
   /**
    * Instantiates a new Individual contributor service.
@@ -62,7 +62,7 @@ public class IndividualContributorService {
    * @param repository          the repository
    * @param satPacketRepository the sat packet repository
    */
-  public IndividualContributorService(
+  public IndivContributorService(
       SoapUtil soapUtil,
       SoapService service,
       SatTokenRepository repository,

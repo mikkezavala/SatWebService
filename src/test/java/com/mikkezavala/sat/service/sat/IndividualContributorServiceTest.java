@@ -30,7 +30,6 @@ import com.mikkezavala.sat.repository.SatClientRepository;
 import com.mikkezavala.sat.repository.SatPacketRepository;
 import com.mikkezavala.sat.repository.SatTokenRepository;
 import com.mikkezavala.sat.service.SoapHandler;
-import com.mikkezavala.sat.service.SoapHandlerTest;
 import com.mikkezavala.sat.service.SoapService;
 import com.mikkezavala.sat.util.SoapUtil;
 import java.io.File;
@@ -64,7 +63,7 @@ public class IndividualContributorServiceTest extends TestBase {
 
   private SatToken token;
 
-  private IndividualContributorService service;
+  private IndivContributorService service;
 
   private static final Pattern BACKOFF_PATTERN = Pattern.compile(
       "Backing off validation request\\. Wait time: \\d+ minutes");
@@ -125,7 +124,7 @@ public class IndividualContributorServiceTest extends TestBase {
     );
 
     SoapService soapService = new SoapService(handler, satClientRepository);
-    service = new IndividualContributorService(
+    service = new IndivContributorService(
         soapUtil, soapService, satTokenRepository, satPcktRepository
     );
   }
@@ -341,11 +340,11 @@ public class IndividualContributorServiceTest extends TestBase {
     assertThat(invoices.getSatState()).isEqualTo(StateCode.READY);
 
     Invoice invoice = invoices.getInvoices().get(0);
-    assertThat(invoice.getFolio()).isEqualTo("2052571552");
-    assertThat(invoice.getIssuer().getRfc()).isEqualTo("BBA830831LJ2");
-    assertThat(invoice.getReceptor().getRfc()).isEqualTo("XXXX8503016C3");
-    assertThat(invoice.getConcepts().getConcept().get(0).getAmount()).isEqualTo(1.0);
-    assertThat(invoice.getConcepts().getConcept().get(0).getServiceCode()).isEqualTo("92356500");
+    assertThat(invoice.folio()).isEqualTo("2052571552");
+    assertThat(invoice.issuer().rfc()).isEqualTo("BBA830831LJ2");
+    assertThat(invoice.receptor().rfc()).isEqualTo("XXXX8503016C3");
+    assertThat(invoice.concepts().getConcept().get(0).getAmount()).isEqualTo(1.0);
+    assertThat(invoice.concepts().getConcept().get(0).getServiceCode()).isEqualTo("92356500");
   }
 
 }

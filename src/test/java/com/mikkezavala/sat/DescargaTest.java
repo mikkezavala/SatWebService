@@ -30,7 +30,7 @@ public class DescargaTest extends TestBase {
         .unmarshal(doc, Invoice.class);
 
     Invoice resolved = body.getValue();
-    assertThat(resolved.getComplement().getPayments().getPayment().getAmount()).isEqualTo(599.0);
+    assertThat(resolved.complement().payments().payment().amount()).isEqualTo(599.0);
   }
 
   @Test
@@ -47,7 +47,7 @@ public class DescargaTest extends TestBase {
         .unmarshal(doc, Invoice.class);
 
     Invoice resolved = body.getValue();
-    assertThat(resolved.getComplement().getPayroll().getTotalDeductions()).isEqualTo(24860.95);
+    assertThat(resolved.complement().payroll().getTotalDeductions()).isEqualTo(24860.95);
   }
 
   @Test
@@ -64,7 +64,7 @@ public class DescargaTest extends TestBase {
         .unmarshal(doc, Invoice.class);
 
     Invoice resolved = body.getValue();
-    assertThat(resolved.getIssuer().getRfc()).isEqualTo("BBA830831LJ2");
+    assertThat(resolved.issuer().rfc()).isEqualTo("BBA830831LJ2");
   }
 
 }
