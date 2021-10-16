@@ -274,7 +274,7 @@ public class IndividualContributorServiceTest extends TestBase {
     Invoices invoices = service.getReceptorInvoices(request);
 
     assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
-    assertThat(invoices.getMessage()).contains("Backing off validation request. Wait time:");
+    assertThat(invoices.getMessage()).matches(BACKOFF_PATTERN);
 
   }
 

@@ -174,7 +174,12 @@ public class IndivContributorControllerTest extends TestBase {
 
   @Test
   public void shouldFailedWhenPFXCreatingFailed() throws Exception {
-    FileUtils.forceDelete(Path.of(KEY_STORE).toFile());
+    File keystore = Path.of(KEY_STORE).toFile();
+    if(keystore.exists()) {
+      FileUtils.forceDelete(keystore);
+    }
+
+    FileUtils.forceMkdir(keystore);
     doNothing().when(satClientRepository).deleteAllByRfc(anyString());
     doThrow(FielFileException.class).when(satClientRepository).save(any(SatClient.class));
 
