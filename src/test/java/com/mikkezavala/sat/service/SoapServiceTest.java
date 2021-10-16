@@ -50,11 +50,11 @@ public class SoapServiceTest extends TestBase {
   void init() throws FileNotFoundException {
 
     File pfxFile = loadResource("PF_CFDI/" + RFC_TEST + ".pfx");
-    SatClient satClient = new SatClient();
-    satClient.setId(1);
-    satClient.setRfc(RFC_TEST);
-    satClient.setKeystore(pfxFile.getPath());
-    satClient.setPasswordPlain("12345678a");
+    SatClient satClient = new SatClient()
+        .id(1)
+        .rfc(RFC_TEST)
+        .keystore(pfxFile.getPath())
+        .passwordPlain(RFC_TEST_PASS);
 
     handler = spy(new SoapHandler(
         getMessageFactory(), getSoapFactory(), getBuilderFactory()
@@ -156,11 +156,12 @@ public class SoapServiceTest extends TestBase {
   public void shouldReturnKeyStoreExceptionWhenIncorrectPass() throws Exception {
 
     File pfxFile = loadResource("PF_CFDI/" + RFC_TEST + ".pfx");
-    SatClient satClient = new SatClient();
-    satClient.setId(1);
-    satClient.setRfc(RFC_TEST);
-    satClient.setKeystore(pfxFile.getPath());
-    satClient.setPasswordPlain("55555");
+    SatClient satClient = new SatClient()
+        .id(1)
+        .rfc(RFC_TEST)
+        .keystore(pfxFile.getPath())
+        .passwordPlain("55555");
+
     when(mockRepository.findSatClientByRfc(anyString())).thenReturn(satClient);
 
     Throwable throwable = assertThrows(SoapSecurityException.class, () ->

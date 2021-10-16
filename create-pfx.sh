@@ -7,18 +7,20 @@ CYAN='\033[1;36m'
 PURPLE='\033[1;35m'
 
 helpFunction(){
-   echo -e "${YELLOW} Usage: $0 -k path -c path"
+   echo -e "${YELLOW} Usage: $0 -k path -c path -p keyPass -r rfc"
    echo -e "\t-k Path to FIEL Key"
    echo -e "\t-c Path to FIEL Cert"
-   echo -e "\t-p FIEL Key Password ${NC}"
+   echo -e "\t-r FIEL Key Password"
+   echo -e "\t-p FIEL Rfc RFC ${NC}"
    exit 1;
 }
 
-while getopts "k:c:p:" opt
+while getopts "k:c:p:r:" opt
 do
    case "$opt" in
       k ) KEY_LOCATION="$OPTARG" ;;
       c ) CERT_LOCATION="$OPTARG" ;;
+      r ) RFC="$OPTARG" ;;
       p ) KEY_PASS="$OPTARG" ;;
       ? ) helpFunction ;;
    esac
@@ -39,13 +41,16 @@ if [ -z "$KEY_PASS" ]; then
   helpFunction
 fi
 
-echo -e "${CYAN} Creating KEY PEM ${NC}"
-openssl pkcs8 -inform der -in $KEY_LOCATION -passin pass:${KEY_PASS} -out key.pem
-echo -e "${CYAN} Creating CER PEM ${NC}"
-openssl x509 -inform der -in $CERT_LOCATION -out cer.pem
-echo -e "${CYAN} Creating PFX. Please add your FIEL KEY Password${NC}"
-openssl pkcs12 -export -in cer.pem -inkey key.pem -out src/main/resources/TEST.pfx
-echo -e "${CYAN} Removing intermediates ${NC}"
-rm key.pem && rm cer.pem
-echo -e "${GREEN} your PFX is now in src/main/resources/TEST.pfx ${NC}"
+if [ -z "$RFC" ]; then
+  echo -e "\n ❌ ${RED} FIEL RFC not set ❌ ${NC}\n"
+  helpFunction
+fi
 
+echo -e "${CYAN} [PFX BUILDER SH]: Creating KEY PEM ${NC}"
+openssl pkcs8 -inform der -in $KEY_LOCATION -passin pass:${KEY_PASS} -out key.pem
+echo -e "${CYAN} [PFX BUILDER SH]: Creating CER PEM ${NC}"
+openssl x509 -inform der -in $CERT_LOCATION -out cer.pem
+openssl pkcs12 -passout pass:${KEY_PASS} -export -in cer.pem -inkey key.pem -out ./keystore/${RFC}.pfx
+echo -e "${CYAN} [PFX BUILDER SH]: Removing intermediates ${NC}"
+rm key.pem && rm cer.pem
+echo -e "${GREEN} [PFX BUILDER SH]: PFX created at: \"./keystore/${RFC}.pfx${NC}\""

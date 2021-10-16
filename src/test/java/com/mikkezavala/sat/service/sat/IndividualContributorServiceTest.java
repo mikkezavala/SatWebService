@@ -77,11 +77,11 @@ public class IndividualContributorServiceTest extends TestBase {
   void init() throws Exception {
 
     File pfxFile = loadResource("PF_CFDI/" + RFC_TEST + ".pfx");
-    SatClient satClient = new SatClient();
-    satClient.setId(1);
-    satClient.setRfc(RFC_TEST);
-    satClient.setKeystore(pfxFile.getPath());
-    satClient.setPasswordPlain("12345678a");
+    SatClient satClient = new SatClient()
+        .id(1)
+        .rfc(RFC_TEST)
+        .keystore(pfxFile.getPath())
+        .passwordPlain(RFC_TEST_PASS);
 
     Timestamp ts = new Timestamp();
     ts.setCreated(ZonedDateTime.now());
@@ -94,7 +94,7 @@ public class IndividualContributorServiceTest extends TestBase {
     token = SatToken.builder()
         .id(1)
         .token("ejToken")
-        .rfc(satClient.getRfc())
+        .rfc(satClient.rfc())
         .created(ts.getCreated())
         .expiration(ts.getExpires()).build();
 

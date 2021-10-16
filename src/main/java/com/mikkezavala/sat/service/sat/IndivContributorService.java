@@ -85,14 +85,19 @@ public class IndivContributorService {
     String rfc = request.getRfc();
     List<Invoice> invoices = new ArrayList<>();
     Invoices.InvoicesBuilder builder = Invoices.builder();
+
+    SatToken satToken = repository.findFirstByRfc(rfc);
     SatPacket satPacket = satPacketRepository.findSatPacketByRfcAndDateEndAndDateStart(
         rfc, request.getDateEnd(), request.getDateStart()
     );
 
-    if (Objects.nonNull(satPacket) && Objects.nonNull(satPacket.getRequestId())) {
+    if (
+        Objects.nonNull(satPacket)
+            && Objects.nonNull(satPacket.getRequestId())
+            && Objects.nonNull(satToken)
+    ) {
       String existentRfc = satPacket.getRfc();
       int times = satPacket.getTimesRequested();
-      SatToken satToken = repository.findFirstByRfc(existentRfc);
       ZonedDateTime expires = satToken.getExpiration();
       Duration tokenValidity = Duration.between(ZonedDateTime.now(), expires);
 
@@ -105,7 +110,7 @@ public class IndivContributorService {
       if (!StateCode.equals(satPacket.getState(), READY)) {
         Duration delta = Duration.between(
             satPacket.getLastRequested().withZoneSameLocal(ZoneId.of(TIME_ZONE)),
-            ZonedDateTime.now()
+            ZonedDateTime.now().withZoneSameLocal(ZoneId.of(TIME_ZONE))
         );
         long waitTime = BACKOFF_TIME - delta.toMinutes();
         if (times > 5 && waitTime >= 0) {
@@ -127,7 +132,7 @@ public class IndivContributorService {
       }
 
     } else {
-      SatToken satToken = getToken(rfc);
+      satToken = getToken(rfc);
       Response response = requestDownload(request, satToken);
       if (Objects.nonNull(response)) {
         String requestId = response.getResult().getRequestId();

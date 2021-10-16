@@ -1,13 +1,17 @@
 package com.mikkezavala.sat.controller;
 
 import static com.mikkezavala.sat.util.Constant.FORMATTER;
+import static com.mikkezavala.sat.util.Constant.KEY_STORE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import com.mikkezavala.sat.TestBase;
 import com.mikkezavala.sat.domain.client.registered.RequestCfdi;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.Invoices;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Complemento;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Invoice;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Issuer;
@@ -15,25 +19,40 @@ import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Payment;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Payments;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Receptor;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.validate.StateCode;
+import com.mikkezavala.sat.repository.SatClientRepository;
 import com.mikkezavala.sat.service.sat.IndivContributorService;
+import java.io.File;
+import java.io.FileInputStream;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+/**
+ * The type Indiv contributor controller test.
+ */
 @ExtendWith(SpringExtension.class)
 public class IndivContributorControllerTest extends TestBase {
 
   @Mock
   private IndivContributorService service;
 
+  @Mock
+  private SatClientRepository satClientRepository;
+
   @InjectMocks
   private IndivContributorController controller;
 
+  /**
+   * Should return invoices.
+   */
   @Test
   public void shouldReturnInvoices() {
     when(service.getReceptorInvoices(any())).thenReturn(buildMockInvoices());
@@ -44,6 +63,44 @@ public class IndivContributorControllerTest extends TestBase {
     Invoices invoices = controller.retrieve(requestCfd);
 
     assertThat(invoices.getInvoices()).hasSize(1);
+  }
+
+  /**
+   * Should create key store.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  public void shouldCreateKeyStore() throws Exception {
+    String keyStore = KEY_STORE + RFC_TEST + ".pfx";
+    SatClient client = new SatClient()
+        .id(1)
+        .rfc(RFC_TEST)
+        .keystore(keyStore)
+        .passwordPlain(RFC_TEST_PASS);
+
+    doNothing().when(satClientRepository).deleteAllByRfc(anyString());
+    when(satClientRepository.save(any(SatClient.class))).thenReturn(client);
+
+    File keyFile = loadResource("PF_CFDI/" + RFC_TEST + ".key");
+    MockMultipartFile key = new MockMultipartFile(
+        "file-key",
+        keyFile.getName(),
+        MediaType.APPLICATION_OCTET_STREAM_VALUE,
+        new FileInputStream(keyFile)
+    );
+
+    File certFile = loadResource("PF_CFDI/" + RFC_TEST + ".cer");
+    MockMultipartFile cert = new MockMultipartFile(
+        "file-cert",
+        certFile.getName(),
+        MediaType.APPLICATION_OCTET_STREAM_VALUE,
+        new FileInputStream(certFile)
+    );
+
+    Map<String, String> res = controller.handleFileUpload(key, cert, RFC_TEST, RFC_TEST_PASS);
+
+    assertThat(res.get("message")).isEqualTo("Keystore created for XOJI740919U48");
 
   }
 
