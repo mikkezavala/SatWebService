@@ -406,7 +406,7 @@ public class IndividualContributorServiceTest extends TestBase {
     Path zipPath = Path.of("./zip", RFC_TEST + "_" + satPacketId + ".zip");
     SatPacket satPacket = SatPacket.builder()
         .rfc(RFC_TEST)
-        .packetId(requestId)
+        .packetId(satPacketId)
         .state(StateCode.READY.name())
         .path(zipPath.toString()).build();
 
@@ -444,7 +444,10 @@ public class IndividualContributorServiceTest extends TestBase {
     request.setDateStart(dateStart);
 
     Invoices invoices = service.getReceptorInvoices(request);
+
+    assertThat(invoices.getInvoices()).hasSize(1);
     assertThat(invoices.getSatState()).isEqualTo(StateCode.READY);
+
   }
 
   private ValidateResponse mockValidateResult(String satPacketId, StateCode stateCode) {
