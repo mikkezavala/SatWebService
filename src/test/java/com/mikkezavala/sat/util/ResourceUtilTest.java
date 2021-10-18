@@ -65,16 +65,4 @@ public class ResourceUtilTest extends TestBase {
     assertThat(list).hasSize(0);
 
   }
-
-  /**
-   * Should encode content.
-   *
-   * @throws Exception the exception
-   */
-  @Test
-  public void shouldEncodeContent() throws Exception {
-    File content = loadResource("CFDI-NOMINA.xml");
-    String zipString = zipAsBase64(content);
-    assertThat(zipString).isNotNull();
-  }
 }
