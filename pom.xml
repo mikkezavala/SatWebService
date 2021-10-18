@@ -21,6 +21,7 @@
 
     <!-- deps versions -->
     <lombok.version>1.18.22</lombok.version>
+    <jaxb-impl.version>3.0.2</jaxb-impl.version>
     <commons.io.version>2.11.0</commons.io.version>
     <commons.lang.version>3.12.0</commons.lang.version>
     <xml-unit-core.version>2.8.2</xml-unit-core.version>
@@ -104,22 +105,9 @@
 
     <!-- JAXB Stuffies -->
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-      <version>2.4.0-b180830.0359</version>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>activation</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-      <version>3.0.2</version>
-      <scope>runtime</scope>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <version>${jaxb-impl.version}</version>
     </dependency>
   </dependencies>
 
