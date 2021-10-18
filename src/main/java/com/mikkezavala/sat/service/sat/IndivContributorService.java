@@ -101,6 +101,8 @@ public class IndivContributorService {
       ZonedDateTime expires = satToken.getExpiration();
       Duration tokenValidity = Duration.between(ZonedDateTime.now(), expires);
 
+      LOGGER.info("SAT Packet In {}. Requesting Validation", satPacket.getState());
+
       if (tokenValidity.getSeconds() < 60) {
         LOGGER.info("Removing old tokens based on last time: {} ", tokenValidity.getSeconds());
         repository.deleteByRfc(existentRfc);
@@ -121,28 +123,27 @@ public class IndivContributorService {
           );
           builder.message("Backing off validation request. Wait time: " + waitTime + " minutes");
         } else {
+          LOGGER.info("Valid request and token. Requesting Download Validation");
           satPacket = validateRequest(satPacket, satToken);
         }
-      } else if (StringUtils.isEmpty(satPacket.getPath()) || !satPacket.isConsumed()) {
-        satPacket = descarga(satPacket, satToken);
       }
-
-      if (StringUtils.isNotEmpty(satPacket.getPath())) {
-        invoices = getFromZip(satPacket.getPath(), Invoice.class);
-      }
-
     } else {
+      LOGGER.info("Creating SAT Packet");
       satToken = getToken(rfc);
       Response response = requestDownload(request, satToken);
       if (Objects.nonNull(response)) {
         String requestId = response.getResult().getRequestId();
+        LOGGER.info("Validating Download Request");
         satPacket = validateRequest(requestId, request, satToken);
-        if (
-            Objects.nonNull(satPacket) && StateCode.equals(satPacket.getState(), READY)
-        ) {
-          satPacket = descarga(satPacket, satToken);
-        }
       }
+    }
+
+    if (StateCode.equals(satPacket.getState(), READY)
+        && (StringUtils.isEmpty(satPacket.getPath())
+        || !satPacket.isConsumed())
+    ) {
+      LOGGER.info("Downloading packet");
+      satPacket = descarga(satPacket, satToken);
     }
 
     if (StringUtils.isNotEmpty(satPacket.getPath())) {
@@ -201,7 +202,7 @@ public class IndivContributorService {
           ), ValidateResponse.class, VALIDA_DESCARGA, runtimeToken
       );
 
-      ValidateResult result = response.getResult();
+      ValidateResult result = response.result();
 
       return satPacketRepository.save(SatPacket.builder()
           .rfc(rfc)
@@ -209,12 +210,12 @@ public class IndivContributorService {
           .timesRequested(1)
           .requestId(requestId)
           .lastRequested(nowTime)
-          .status(result.getStatus())
-          .message(result.getMessage())
+          .status(result.status())
+          .message(result.message())
           .dateEnd(request.getDateEnd())
-          .state(result.getState().name())
+          .state(result.state().name())
           .dateStart(request.getDateStart())
-          .packetId(StringUtils.join(result.getIdsPaquetes(), ",")).build()
+          .packetId(StringUtils.join(result.IdsPaquetes(), ",")).build()
       );
     } catch (Exception e) {
       LOGGER.error("failed validating request", e);
@@ -235,12 +236,12 @@ public class IndivContributorService {
           ), ValidateResponse.class, VALIDA_DESCARGA, runtimeToken
       );
 
-      ValidateResult result = response.getResult();
+      ValidateResult result = response.result();
       return satPacketRepository.save(packet.toBuilder()
-          .status(result.getStatus())
-          .message(result.getMessage())
-          .state(result.getState().name())
-          .packetId(StringUtils.join(result.getIdsPaquetes(), ","))
+          .status(result.status())
+          .message(result.message())
+          .state(result.state().name())
+          .packetId(StringUtils.join(result.IdsPaquetes(), ","))
           .timesRequested(packet.getTimesRequested() + 1).build()
       );
     } catch (Exception e) {
@@ -260,12 +261,13 @@ public class IndivContributorService {
           service.download(packedId, rfc), DownloadResponse.class, DESCARGA_MASIVA, token.getToken()
       );
 
-      String zip = saveZip(out.getPaquete(), uuid);
+      String zip = saveZip(out.paquete(), uuid);
       return satPacketRepository.save(satPacket.toBuilder()
-          .path(zip).consumed(true).build()
+          .path(zip).consumed(true).status(READY.name()).build()
       );
     } catch (Exception e) {
       return satPacket;
     }
   }
+
 }

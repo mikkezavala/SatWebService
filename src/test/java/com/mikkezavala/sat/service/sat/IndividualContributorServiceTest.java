@@ -4,6 +4,7 @@ import static com.mikkezavala.sat.domain.sat.SoapEndpoint.AUTENTICA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.DESCARGA_MASIVA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.SOLICITA_DESCARGA;
 import static com.mikkezavala.sat.domain.sat.SoapEndpoint.VALIDA_DESCARGA;
+import static com.mikkezavala.sat.domain.sat.cfdi.individual.validate.StateCode.IN_PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -33,6 +34,7 @@ import com.mikkezavala.sat.service.SoapHandler;
 import com.mikkezavala.sat.service.SoapService;
 import com.mikkezavala.sat.util.SoapUtil;
 import java.io.File;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.UUID;
@@ -138,14 +140,7 @@ public class IndividualContributorServiceTest extends TestBase {
   public void shouldReturnInProgress() throws Exception {
     RequestCfdi request = new RequestCfdi();
     String satPacketId = UUID.randomUUID().toString();
-    ValidateResponse validation = new ValidateResponse();
-    ValidateResult validationResult = new ValidateResult();
-
-    validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
-    validationResult.setState(StateCode.IN_PROGRESS);
-    validationResult.setStatus("5000");
-    validationResult.setCfdiCount(5);
-    validation.setResult(validationResult);
+    ValidateResponse validation = mockValidateResult(satPacketId, IN_PROGRESS);
 
     when(soapUtil.callWebService(
         any(), any(), eq(VALIDA_DESCARGA),
@@ -155,7 +150,7 @@ public class IndividualContributorServiceTest extends TestBase {
     when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
         anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
     ).thenReturn(
-        SatPacket.builder().packetId(satPacketId).state(StateCode.IN_PROGRESS.name()).build()
+        SatPacket.builder().packetId(satPacketId).state(IN_PROGRESS.name()).build()
     );
 
     ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
@@ -165,7 +160,7 @@ public class IndividualContributorServiceTest extends TestBase {
     request.setDateStart(dateStart);
 
     Invoices invoices = service.getReceptorInvoices(request);
-    assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
+    assertThat(invoices.getSatState()).isEqualTo(IN_PROGRESS);
   }
 
   /**
@@ -176,14 +171,6 @@ public class IndividualContributorServiceTest extends TestBase {
     RequestCfdi request = new RequestCfdi();
     String requestId = UUID.randomUUID().toString();
     String satPacketId = UUID.randomUUID().toString();
-    ValidateResponse validation = new ValidateResponse();
-    ValidateResult validationResult = new ValidateResult();
-
-    validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
-    validationResult.setState(StateCode.IN_PROGRESS);
-    validationResult.setStatus("5000");
-    validationResult.setCfdiCount(5);
-    validation.setResult(validationResult);
 
     when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
         anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
@@ -192,7 +179,7 @@ public class IndividualContributorServiceTest extends TestBase {
         .requestId(requestId)
         .timesRequested(1)
         .packetId(satPacketId)
-        .state(StateCode.IN_PROGRESS.name())
+        .state(IN_PROGRESS.name())
         .lastRequested(ZonedDateTime.now().minusMinutes(1)).build()
     );
 
@@ -211,7 +198,7 @@ public class IndividualContributorServiceTest extends TestBase {
     request.setDateStart(dateStart);
 
     Invoices invoices = service.getReceptorInvoices(request);
-    assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
+    assertThat(invoices.getSatState()).isEqualTo(IN_PROGRESS);
   }
 
   /**
@@ -224,21 +211,14 @@ public class IndividualContributorServiceTest extends TestBase {
     RequestCfdi request = new RequestCfdi();
     String requestId = UUID.randomUUID().toString();
     String satPacketId = UUID.randomUUID().toString();
-    ValidateResponse validation = new ValidateResponse();
-    ValidateResult validationResult = new ValidateResult();
-
-    validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
-    validationResult.setState(StateCode.IN_PROGRESS);
-    validationResult.setStatus("5000");
-    validationResult.setCfdiCount(1);
-    validation.setResult(validationResult);
+    ValidateResponse validation = mockValidateResult(satPacketId, IN_PROGRESS);
 
     SatPacket packet = SatPacket.builder()
         .rfc(RFC_TEST)
         .timesRequested(6)
         .requestId(requestId)
         .packetId(satPacketId)
-        .state(StateCode.IN_PROGRESS.name())
+        .state(IN_PROGRESS.name())
         .lastRequested(ZonedDateTime.now().plusHours(2)).build();
 
     when(soapUtil.callWebService(
@@ -273,7 +253,7 @@ public class IndividualContributorServiceTest extends TestBase {
 
     Invoices invoices = service.getReceptorInvoices(request);
 
-    assertThat(invoices.getSatState()).isEqualTo(StateCode.IN_PROGRESS);
+    assertThat(invoices.getSatState()).isEqualTo(IN_PROGRESS);
     assertThat(invoices.getMessage()).matches(BACKOFF_PATTERN);
 
   }
@@ -288,20 +268,10 @@ public class IndividualContributorServiceTest extends TestBase {
     RequestCfdi request = new RequestCfdi();
     ZonedDateTime now = ZonedDateTime.now();
 
-    DownloadResponse downloadResponse = new DownloadResponse();
-    downloadResponse.setPaquete(extractFile("demo.zip"));
-
     String requestId = UUID.randomUUID().toString();
     String satPacketId = UUID.randomUUID().toString();
-
-    ValidateResponse validation = new ValidateResponse();
-    ValidateResult validationResult = new ValidateResult();
-
-    validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
-    validationResult.setState(StateCode.READY);
-    validationResult.setStatus("5000");
-    validationResult.setCfdiCount(5);
-    validation.setResult(validationResult);
+    ValidateResponse validation = mockValidateResult(satPacketId, IN_PROGRESS);
+    DownloadResponse downloadResponse = new DownloadResponse().paquete(extractFile("demo.zip"));
 
     SatPacket satPacket = SatPacket.builder()
         .rfc(RFC_TEST)
@@ -352,25 +322,21 @@ public class IndividualContributorServiceTest extends TestBase {
     assertThat(invoice.concepts().getConcept().get(0).getServiceCode()).isEqualTo("92356500");
   }
 
+  /**
+   * Should return happy path.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void shouldReturnHappyPath() throws Exception {
     RequestCfdi request = new RequestCfdi();
     ZonedDateTime now = ZonedDateTime.now();
 
-    DownloadResponse downloadResponse = new DownloadResponse();
-    downloadResponse.setPaquete(extractFile("demo.zip"));
-
     String requestId = UUID.randomUUID().toString();
     String satPacketId = UUID.randomUUID().toString();
 
-    ValidateResponse validation = new ValidateResponse();
-    ValidateResult validationResult = new ValidateResult();
-
-    validationResult.setIdsPaquetes(Collections.singletonList(satPacketId));
-    validationResult.setState(StateCode.READY);
-    validationResult.setStatus("5000");
-    validationResult.setCfdiCount(5);
-    validation.setResult(validationResult);
+    ValidateResponse validation = mockValidateResult(satPacketId, IN_PROGRESS);
+    DownloadResponse downloadResponse = new DownloadResponse().paquete(extractFile("demo.zip"));
 
     SatPacket satPacket = SatPacket.builder()
         .rfc(RFC_TEST)
@@ -421,4 +387,73 @@ public class IndividualContributorServiceTest extends TestBase {
     assertThat(invoice.concepts().getConcept().get(0).getServiceCode()).isEqualTo("92356500");
   }
 
+  /**
+   * Should return invoices from existent package.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  public void shouldReturnInvoicesFromExistentPackage() throws Exception {
+    RequestCfdi request = new RequestCfdi();
+    String requestId = "MOCKED";
+    String satPacketId = "MOCKED_PID";
+    String satPacketContent = zipAsBase64(loadResource("RESPUESTA-DESCARGA.xml"));
+    DownloadResponse downloadResponse = new DownloadResponse().paquete(satPacketContent);
+
+    ZonedDateTime dateEnd = ZonedDateTime.now().plusDays(5);
+    ZonedDateTime dateStart = dateEnd.minusDays(5);
+
+    Path zipPath = Path.of("./zip", RFC_TEST + "_" + satPacketId + ".zip");
+    SatPacket satPacket = SatPacket.builder()
+        .rfc(RFC_TEST)
+        .packetId(requestId)
+        .state(StateCode.READY.name())
+        .path(zipPath.toString()).build();
+
+    when(soapUtil.callWebService(
+        any(), any(), eq(VALIDA_DESCARGA), nullable(String.class))
+    ).thenReturn(mockValidateResult(satPacketId, IN_PROGRESS));
+
+    when(soapUtil.callWebService(
+        any(), any(), eq(DESCARGA_MASIVA), nullable(String.class))
+    ).thenReturn(downloadResponse);
+
+    when(satPcktRepository.findSatPacketByRfcAndDateEndAndDateStart(
+        anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))
+    ).thenReturn(SatPacket.builder()
+        .rfc(RFC_TEST)
+        .requestId(requestId)
+        .timesRequested(1)
+        .packetId(satPacketId)
+        .state(IN_PROGRESS.name())
+        .lastRequested(ZonedDateTime.now().minusMinutes(1)).build()
+    );
+
+    when(satTokenRepository.findFirstByRfc(anyString())).thenReturn(SatToken.builder()
+        .id(1)
+        .rfc(RFC_TEST)
+        .token("fakeToken")
+        .created(ZonedDateTime.now().minusMinutes(3))
+        .expiration(ZonedDateTime.now().minusMinutes(5)).build()
+    );
+
+    when(satPcktRepository.save(any())).thenReturn(satPacket);
+
+    request.setRfc(RFC_TEST);
+    request.setDateEnd(dateEnd);
+    request.setDateStart(dateStart);
+
+    Invoices invoices = service.getReceptorInvoices(request);
+    assertThat(invoices.getSatState()).isEqualTo(StateCode.READY);
+  }
+
+  private ValidateResponse mockValidateResult(String satPacketId, StateCode stateCode) {
+    ValidateResult validationResult = new ValidateResult()
+        .IdsPaquetes(Collections.singletonList(satPacketId))
+        .state(stateCode)
+        .status("5000")
+        .cfdiCount(5);
+
+    return new ValidateResponse().result(validationResult);
+  }
 }

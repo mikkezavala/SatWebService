@@ -8,11 +8,7 @@ import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Invoice;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.io.FileUtils;
@@ -68,5 +64,17 @@ public class ResourceUtilTest extends TestBase {
 
     assertThat(list).hasSize(0);
 
+  }
+
+  /**
+   * Should encode content.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  public void shouldEncodeContent() throws Exception {
+    File content = loadResource("CFDI-NOMINA.xml");
+    String zipString = zipAsBase64(content);
+    assertThat(zipString).isNotNull();
   }
 }
