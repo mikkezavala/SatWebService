@@ -24,6 +24,7 @@
     <jaxb-impl.version>3.0.2</jaxb-impl.version>
     <commons.io.version>2.11.0</commons.io.version>
     <commons.lang.version>3.12.0</commons.lang.version>
+    <commons.commons-exec>1.3</commons.commons-exec>
     <xml-unit-core.version>2.8.2</xml-unit-core.version>
     <xml-unit-assertj.version>2.8.2</xml-unit-assertj.version>
   </properties>
@@ -79,7 +80,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-exec</artifactId>
-      <version>1.3</version>
+      <version>${commons.commons-exec}</version>
     </dependency>
 
     <!-- Test Deps -->
