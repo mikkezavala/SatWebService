@@ -82,3 +82,5 @@ Por default este servicio wvit mas peticiones al SAT si se ha llamado mas de 5 v
 
 ## Open Source
 La idea de esto es que la comunidad lo haga robusto. No temas en crear Issues y colaborar!
+
+Pasa a revisar nuesta licencia Open Source (GNU General Public License): [GNU GPL](/LICENSE)
