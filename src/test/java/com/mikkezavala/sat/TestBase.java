@@ -14,7 +14,10 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.MessageFactory;
@@ -110,6 +113,23 @@ abstract public class TestBase {
 
   public File loadResource(String file) throws FileNotFoundException {
     return ResourceUtils.getFile("classpath:" + file);
+  }
+
+  protected String zipAsBase64(File zipContent) throws IOException {
+    byte[] buffer = new byte[1024];
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+        try (FileInputStream fis = new FileInputStream(zipContent)) {
+          zos.putNextEntry(new ZipEntry(zipContent.getName()));
+          int length;
+          while ((length = fis.read(buffer)) > 0) {
+            zos.write(buffer, 0, length);
+          }
+          zos.closeEntry();
+        }
+    }
+    byte[] bytes = baos.toByteArray();
+    return Base64.getEncoder().encodeToString(bytes);
   }
 
 }
