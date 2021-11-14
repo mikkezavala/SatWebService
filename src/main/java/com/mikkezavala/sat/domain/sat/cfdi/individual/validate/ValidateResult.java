@@ -1,5 +1,7 @@
 package com.mikkezavala.sat.domain.sat.cfdi.individual.validate;
 
+import static com.mikkezavala.sat.util.Constant.SAT_DESCARGA_MASIVA_NS;
+
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -25,7 +27,7 @@ public class ValidateResult {
   @XmlAttribute(name = "NumeroCFDIs")
   private int cfdiCount;
 
-  @XmlElement(name = "IdsPaquetes", namespace = "http://DescargaMasivaTerceros.sat.gob.mx")
+  @XmlElement(name = "IdsPaquetes", namespace = SAT_DESCARGA_MASIVA_NS)
   private List<String> IdsPaquetes;
 
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
+@Accessors(fluent = true)
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "peticionDescarga")
 public class DownloadRequest {

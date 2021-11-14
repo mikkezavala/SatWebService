@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Invoice;
 import java.io.File;
 import java.io.FileInputStream;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.parsers.DocumentBuilder;
@@ -19,7 +18,7 @@ public class DescargaTest extends TestBase {
   @Test
   public void shouldParseDomain() throws Exception {
 
-    File inpt = loadResource("CFDI.xml");
+    File inpt = loadResourceAsFile("CFDI.xml");
     FileInputStream fos = new FileInputStream(inpt);
 
     DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -36,7 +35,7 @@ public class DescargaTest extends TestBase {
   @Test
   public void shouldParsePayrollDomain() throws Exception {
 
-    File inpt = loadResource("CFDI-NOMINA.xml");
+    File inpt = loadResourceAsFile("CFDI-NOMINA.xml");
     FileInputStream fos = new FileInputStream(inpt);
 
     DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -53,7 +52,7 @@ public class DescargaTest extends TestBase {
   @Test
   public void shouldParseConcepts() throws Exception {
 
-    File inpt = loadResource("CFDI-CONCEPTS.xml");
+    File inpt = loadResourceAsFile("CFDI-CONCEPTS.xml");
     FileInputStream fos = new FileInputStream(inpt);
 
     DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

@@ -11,7 +11,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.mikkezavala.sat.TestBase;
-import com.mikkezavala.sat.domain.client.registered.RequestCfdi;
+import com.mikkezavala.sat.domain.client.registered.RequestCFDI;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.Invoices;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.entity.Complemento;
@@ -24,7 +24,7 @@ import com.mikkezavala.sat.domain.sat.cfdi.individual.validate.StateCode;
 import com.mikkezavala.sat.exception.FielException;
 import com.mikkezavala.sat.exception.FielFileException;
 import com.mikkezavala.sat.repository.SatClientRepository;
-import com.mikkezavala.sat.service.sat.IndivContributorService;
+import com.mikkezavala.sat.service.IndivContributorService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Path;
@@ -61,11 +61,11 @@ public class IndivContributorControllerTest extends TestBase {
    */
   @Test
   public void shouldReturnInvoices() {
+    ZonedDateTime now = ZonedDateTime.now();
     when(service.getReceptorInvoices(any())).thenReturn(buildMockInvoices());
-    RequestCfdi requestCfd = new RequestCfdi();
-    requestCfd.setRfc(RFC_TEST);
-    requestCfd.setDateStart(ZonedDateTime.now());
-    requestCfd.setDateStart(ZonedDateTime.now().plusDays(2));
+    RequestCFDI requestCfd = RequestCFDI.builder()
+        .rfc(RFC_TEST).dateStart(now).dateEnd(now.plusDays(2)).build();
+
     Invoices invoices = controller.retrieve(requestCfd);
 
     assertThat(invoices.getInvoices()).hasSize(1);
@@ -78,7 +78,7 @@ public class IndivContributorControllerTest extends TestBase {
    */
   @Test
   public void shouldCreateKeyStore() throws Exception {
-    String keyStore = KEY_STORE + RFC_TEST + ".pfx";
+    String keyStore = KEY_STORE + RFC_TEST + ".p12";
     SatClient client = new SatClient()
         .id(1)
         .rfc(RFC_TEST)
@@ -88,7 +88,7 @@ public class IndivContributorControllerTest extends TestBase {
     doNothing().when(satClientRepository).deleteAllByRfc(anyString());
     when(satClientRepository.save(any(SatClient.class))).thenReturn(client);
 
-    File keyFile = loadResource("PF_CFDI/" + RFC_TEST + ".key");
+    File keyFile = loadResourceAsFile("PF_CFDI/" + RFC_TEST + ".key");
     MockMultipartFile key = new MockMultipartFile(
         "file-key",
         keyFile.getName(),
@@ -96,7 +96,7 @@ public class IndivContributorControllerTest extends TestBase {
         new FileInputStream(keyFile)
     );
 
-    File certFile = loadResource("PF_CFDI/" + RFC_TEST + ".cer");
+    File certFile = loadResourceAsFile("PF_CFDI/" + RFC_TEST + ".cer");
     MockMultipartFile cert = new MockMultipartFile(
         "file-cert",
         certFile.getName(),
@@ -110,7 +110,7 @@ public class IndivContributorControllerTest extends TestBase {
 
   @Test
   public void shouldFailedCreateKeyStore() throws Exception {
-    String keyStore = KEY_STORE + RFC_TEST + ".pfx";
+    String keyStore = KEY_STORE + RFC_TEST + ".p12";
     SatClient client = new SatClient()
         .id(null)
         .rfc(RFC_TEST)
@@ -120,7 +120,7 @@ public class IndivContributorControllerTest extends TestBase {
     doNothing().when(satClientRepository).deleteAllByRfc(anyString());
     when(satClientRepository.save(any(SatClient.class))).thenReturn(client);
 
-    File keyFile = loadResource("PF_CFDI/" + RFC_TEST + ".key");
+    File keyFile = loadResourceAsFile("PF_CFDI/" + RFC_TEST + ".key");
     MockMultipartFile key = new MockMultipartFile(
         "file-key",
         keyFile.getName(),
@@ -128,7 +128,7 @@ public class IndivContributorControllerTest extends TestBase {
         new FileInputStream(keyFile)
     );
 
-    File certFile = loadResource("PF_CFDI/" + RFC_TEST + ".cer");
+    File certFile = loadResourceAsFile("PF_CFDI/" + RFC_TEST + ".cer");
     MockMultipartFile cert = new MockMultipartFile(
         "file-cert",
         certFile.getName(),
@@ -149,7 +149,7 @@ public class IndivContributorControllerTest extends TestBase {
     doNothing().when(satClientRepository).deleteAllByRfc(anyString());
     doThrow(FielFileException.class).when(satClientRepository).save(any(SatClient.class));
 
-    File keyFile = loadResource("PF_CFDI/" + RFC_TEST + ".key");
+    File keyFile = loadResourceAsFile("PF_CFDI/" + RFC_TEST + ".key");
     MockMultipartFile key = new MockMultipartFile(
         "file-key",
         keyFile.getName(),
@@ -157,7 +157,7 @@ public class IndivContributorControllerTest extends TestBase {
         new FileInputStream(keyFile)
     );
 
-    File certFile = loadResource("PF_CFDI/" + RFC_TEST + ".cer");
+    File certFile = loadResourceAsFile("PF_CFDI/" + RFC_TEST + ".cer");
     MockMultipartFile cert = new MockMultipartFile(
         "file-cert",
         certFile.getName(),
@@ -183,7 +183,7 @@ public class IndivContributorControllerTest extends TestBase {
     doNothing().when(satClientRepository).deleteAllByRfc(anyString());
     doThrow(FielFileException.class).when(satClientRepository).save(any(SatClient.class));
 
-    File keyFile = loadResource("PF_CFDI/" + RFC_TEST + ".key");
+    File keyFile = loadResourceAsFile("PF_CFDI/" + RFC_TEST + ".key");
     MockMultipartFile key = new MockMultipartFile(
         "file-key",
         keyFile.getName(),
@@ -191,7 +191,7 @@ public class IndivContributorControllerTest extends TestBase {
         new FileInputStream(keyFile)
     );
 
-    File certFile = loadResource("PF_CFDI/" + RFC_TEST + ".cer");
+    File certFile = loadResourceAsFile("PF_CFDI/" + RFC_TEST + ".cer");
     MockMultipartFile cert = new MockMultipartFile(
         "file-cert",
         certFile.getName(),

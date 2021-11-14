@@ -49,7 +49,7 @@ public class ResourceUtilTest extends TestBase {
   @Test
   public void getFromZip() throws FileNotFoundException {
     List<Invoice> invoices = ResourceUtil.getFromZip(
-        loadResource("demo.zip").toString(), Invoice.class
+        loadResourceAsFile("demo.zip").toString(), Invoice.class
     );
 
     assertThat(invoices).hasSize(1);

@@ -6,6 +6,6 @@ ARG JAR_FILE=target/sat-web-service.jar
 
 COPY ${JAR_FILE} sat-web-service.jar
 
-COPY ./create-pfx.sh ./create-pfx.sh
+COPY create-p12.sh ./create-pfx.sh
 
 ENTRYPOINT ["java","-jar", "-Dspring.profiles.active=docker", "/sat-web-service.jar"]

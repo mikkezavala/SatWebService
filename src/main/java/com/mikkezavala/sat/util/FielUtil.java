@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FielUtil {
 
-  private static final String COMMAND_PLACEHOLDER = "./create-pfx.sh -r %s -c %s -k %s -p %s";
+  private static final String COMMAND_PLACEHOLDER = "./create-p12.sh -r %s -c %s -k %s -p %s";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FielUtil.class);
 
@@ -24,18 +24,18 @@ public class FielUtil {
    * @param pass the pass
    * @return the int
    */
-  public static int generatePFX(String rfc, Path cert, Path key, String pass) {
+  public static int generateP12(String rfc, Path cert, Path key, String pass) {
 
     String command = String.format(COMMAND_PLACEHOLDER, rfc, cert, key, pass);
 
-    LOGGER.info("Generating PFX");
+    LOGGER.info("Generating P12");
     CommandLine cmd = CommandLine.parse(command);
     DefaultExecutor exec = new DefaultExecutor();
 
     try {
       return exec.execute(cmd);
     } catch (Exception e) {
-      LOGGER.error("Error generating PFX");
+      LOGGER.error("Error generating P12");
     }
 
     return -1;

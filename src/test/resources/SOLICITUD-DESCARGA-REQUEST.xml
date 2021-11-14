@@ -1,0 +1,37 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <s:Body>
+    <ns2:SolicitaDescarga xmlns="http://DescargaMasivaTerceros.sat.gob.mx"
+      xmlns:ns2="http://DescargaMasivaTerceros.sat.gob.mx">
+      <ns2:solicitud FechaFinal="2021-10-09T03:12:50.000Z" FechaInicial="2021-08-09T04:10:36.000Z"
+        RfcReceptor="CUSTRFC" RfcSolicitante="CUSTRFC" TipoSolicitud="CFDI">
+        <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+          <SignedInfo>
+            <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+            <Reference URI="">
+              <Transforms>
+                <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+              </Transforms>
+              <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+              <DigestValue>DIGEST=</DigestValue>
+            </Reference>
+          </SignedInfo>
+          <SignatureValue>Signature==</SignatureValue>
+          <KeyInfo>
+            <X509Data>
+              <X509Certificate>CERT==</X509Certificate>
+              <X509IssuerSerial>
+                <X509IssuerName>
+                  ISSUER NAMES
+                </X509IssuerName>
+                <X509SerialNumber>SERIAL</X509SerialNumber>
+              </X509IssuerSerial>
+            </X509Data>
+          </KeyInfo>
+        </Signature>
+      </ns2:solicitud>
+    </ns2:SolicitaDescarga>
+  </s:Body>
+</s:Envelope>

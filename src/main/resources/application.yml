@@ -8,3 +8,7 @@ spring:
     username: sat_user
     password: sat_pass
     driver-class-name: "com.mysql.cj.jdbc.Driver"
+
+logging:
+  level:
+    root: INFO

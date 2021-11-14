@@ -34,9 +34,9 @@ public class FielUtilTest extends TestBase {
 
   @Test
   public void shouldGeneratePfx() throws FileNotFoundException {
-    Path key = loadResource("PF_CFDI").toPath().resolve(RFC_TEST + ".key");
-    Path cert = loadResource("PF_CFDI").toPath().resolve(RFC_TEST + ".cer");
-    int exitCode = FielUtil.generatePFX(RFC_TEST, cert, key, RFC_TEST_PASS);
+    Path key = loadResourceAsFile("PF_CFDI").toPath().resolve(RFC_TEST + ".key");
+    Path cert = loadResourceAsFile("PF_CFDI").toPath().resolve(RFC_TEST + ".cer");
+    int exitCode = FielUtil.generateP12(RFC_TEST, cert, key, RFC_TEST_PASS);
     assertThat(exitCode).isEqualTo(0);
   }
 
@@ -48,9 +48,9 @@ public class FielUtilTest extends TestBase {
    */
   @Test
   public void shouldFailOpenWithWrongPassword() throws FileNotFoundException {
-    Path key = loadResource("PF_CFDI").toPath().resolve(RFC_TEST + ".key");
-    Path cert = loadResource("PF_CFDI").toPath().resolve(RFC_TEST + ".cer");
-    int exitCode = FielUtil.generatePFX(RFC_TEST, cert, key, "WRONG");
+    Path key = loadResourceAsFile("PF_CFDI").toPath().resolve(RFC_TEST + ".key");
+    Path cert = loadResourceAsFile("PF_CFDI").toPath().resolve(RFC_TEST + ".cer");
+    int exitCode = FielUtil.generateP12(RFC_TEST, cert, key, "WRONG");
     assertThat(exitCode).isEqualTo(-1);
   }
 }

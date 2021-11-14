@@ -32,6 +32,8 @@ public class ResourceUtil {
 
   private static final DocumentBuilderFactory DOC_FACTORY = DocumentBuilderFactory.newInstance();
 
+  private static final String LOGGER_PREFIX = "[RESOURCE UTIL]: {}{}";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtil.class);
 
   /**
@@ -49,7 +51,7 @@ public class ResourceUtil {
       try {
         FileUtils.forceMkdir(dir);
       } catch (IOException e) {
-        LOGGER.error("Could not create: {}", dir.getPath());
+        LOGGER.error(LOGGER_PREFIX, "Could not create ZipFile = ", dir.getPath());
       }
     }
 
@@ -57,7 +59,7 @@ public class ResourceUtil {
     try (FileOutputStream outputStream = new FileOutputStream(zipFilePath)) {
       outputStream.write(bytes);
     } catch (IOException e) {
-      LOGGER.error("Could not save Zip file");
+      LOGGER.error(LOGGER_PREFIX, "Could not save ZipFle = ", zipFilePath);
     }
 
     return zipFilePath;
@@ -72,13 +74,13 @@ public class ResourceUtil {
    * @return the from zip
    */
   public static <T> List<T> getFromZip(String path, Class<T> clazz) {
-    LOGGER.info("Reading ZipFile");
+    LOGGER.info(LOGGER_PREFIX, "Reading ZipFile=", path);
     ZipFile zipFile;
     String className = clazz.getName();
     try {
       zipFile = new ZipFile(path);
     } catch (IOException e) {
-      LOGGER.error("Failed reading client package zip file for class: {}", className);
+      LOGGER.error(LOGGER_PREFIX, "Failed reading client package ZipFile for class = ", className);
       return Collections.emptyList();
     }
 
@@ -96,7 +98,7 @@ public class ResourceUtil {
 
         elements.add(content.getValue());
       } catch (IOException | SAXException | JAXBException | ParserConfigurationException e) {
-        LOGGER.error("Failed parsing zip file into List<{}>", className);
+        LOGGER.error(LOGGER_PREFIX, "Failed parsing zip file into List<" + className + ">", null);
       }
     }
 

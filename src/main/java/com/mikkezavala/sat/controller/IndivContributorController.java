@@ -1,15 +1,16 @@
 package com.mikkezavala.sat.controller;
 
 import static com.mikkezavala.sat.util.Constant.KEY_STORE;
-import static com.mikkezavala.sat.util.FielUtil.generatePFX;
+import static com.mikkezavala.sat.util.FielUtil.generateP12;
 
-import com.mikkezavala.sat.domain.client.registered.RequestCfdi;
+import com.mikkezavala.sat.domain.client.registered.RequestCFDI;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.Invoices;
 import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.SatToken;
 import com.mikkezavala.sat.exception.FielException;
 import com.mikkezavala.sat.exception.FielFileException;
 import com.mikkezavala.sat.repository.SatClientRepository;
-import com.mikkezavala.sat.service.sat.IndivContributorService;
+import com.mikkezavala.sat.service.IndivContributorService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,12 +33,14 @@ import org.springframework.web.multipart.MultipartFile;
  * The type Indiv contributor controller.
  */
 @RestController
-@RequestMapping(path = "/v1/persona-fisica")
+@RequestMapping(path = "/v1/persona-fisica", produces = MediaType.APPLICATION_JSON_VALUE)
 public class IndivContributorController {
 
   private final IndivContributorService service;
 
   private final SatClientRepository satClientRepository;
+
+  private static final String LOGGER_PREFIX = "[INDIVIDUAL CONTROLLER]: {}{}";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndivContributorController.class);
 
@@ -61,9 +65,11 @@ public class IndivContributorController {
    * @return the invoices
    */
   @PostMapping("/download-received")
-  public Invoices retrieve(@RequestBody RequestCfdi request) {
-    LOGGER.info("Getting invoices for: {}", request.getRfc());
-    return service.getReceptorInvoices(request);
+  public Invoices retrieve(@RequestBody RequestCFDI request) {
+    LOGGER.info(LOGGER_PREFIX, "Invoices for = ", request.getRfc());
+
+    Invoices invoices = service.getReceptorInvoices(request);
+    return invoices;
   }
 
   /**
@@ -98,7 +104,7 @@ public class IndivContributorController {
       Path certLoc = keyStorePath.resolve(rfc).resolve(uuid + "-cert.cer");
       FileUtils.writeByteArrayToFile(certLoc.toFile(), certFile.getBytes());
 
-      int exitCode = generatePFX(rfc, certLoc, keyLoc, pass);
+      int exitCode = generateP12(rfc, certLoc, keyLoc, pass);
       Path tmpDir = keyStorePath.resolve(rfc);
       FileUtils.forceDelete(tmpDir.toFile());
 
@@ -119,6 +125,12 @@ public class IndivContributorController {
 
   }
 
+  @PostMapping("/token")
+  public SatToken getToken(@RequestBody RequestCFDI request) {
+    LOGGER.info(LOGGER_PREFIX, "Token for = ", request.getRfc());
+    return service.getToken(request.getRfc());
+  }
+
   /**
    * Save key sat client.
    *
@@ -131,7 +143,7 @@ public class IndivContributorController {
     try {
 
       SatClient satClient = new SatClient();
-      File keyFile = (new File(KEY_STORE + rfc + ".pfx"));
+      File keyFile = (new File(KEY_STORE + rfc + ".p12"));
 
       satClient.keystore(keyFile.getAbsolutePath());
       satClient.passwordPlain(pass);
