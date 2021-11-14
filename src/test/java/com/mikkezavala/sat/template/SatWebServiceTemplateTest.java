@@ -30,6 +30,9 @@ import org.springframework.ws.client.core.WebServiceMessageCallback;
 import org.springframework.ws.client.core.WebServiceMessageExtractor;
 import org.springframework.ws.test.client.MockWebServiceServer;
 
+/**
+ * The type Sat web service template test.
+ */
 @ExtendWith(SpringExtension.class)
 class SatWebServiceTemplateTest extends TestBase {
 
@@ -40,12 +43,20 @@ class SatWebServiceTemplateTest extends TestBase {
 
   private MockWebServiceServer mockServer;
 
+  /**
+   * Init.
+   */
   @BeforeEach
   protected void init() {
     this.serviceTemplate = spy(new SatWebServiceTemplate(marshaller));
     this.mockServer = MockWebServiceServer.createServer(serviceTemplate);
   }
 
+  /**
+   * Should marshal send and receive with props.
+   *
+   * @throws IOException the io exception
+   */
   @Test
   public void shouldMarshalSendAndReceiveWithProps() throws IOException {
     ZonedDateTime now = ZonedDateTime.now();
@@ -74,9 +85,14 @@ class SatWebServiceTemplateTest extends TestBase {
     assertThat(response.paquete()).isNotNull();
   }
 
+  /**
+   * Should fail with transport when marshal.
+   *
+   * @throws IOException the io exception
+   */
   @Test
   @SuppressWarnings("unchecked")
-  public void shouldFailWithTransport() throws IOException {
+  public void shouldFailWithTransportWhenMarshal() throws IOException {
 
     WSTemplateProps props = WSTemplateProps.builder()
         .rfc(RFC_TEST)
@@ -97,11 +113,47 @@ class SatWebServiceTemplateTest extends TestBase {
     );
 
     assertThat(exception.getMessage()).isEqualTo("Could not use transport: Failed to connect");
-
   }
 
+  /**
+   * Should fail when unmarshal not present.
+   *
+   * @throws IOException the io exception
+   */
   @Test
-  public void shouldFailWithIllegalWhenMarshalNotPresent() throws IOException {
+  public void shouldFailWhenUnmarshalNotPresent() throws IOException {
+
+    WSTemplateProps props = WSTemplateProps.builder()
+        .rfc(RFC_TEST)
+        .endpoint(SOLICITA_DESCARGA)
+        .qualifiedName(new QName(SAT_DESCARGA_MASIVA_NS, "SolicitaDescarga")).build();
+
+    RequestDownload req = new RequestDownload().request(new Request()
+        .rfcRequest(RFC_TEST)
+        .rfcReceptor(RFC_TEST)
+        .requestType(DEFAULT_REQUEST_TYPE)
+    );
+    when(serviceTemplate.getUnmarshaller()).thenReturn(null);
+
+    mockServer.expect(connectionTo(props.getEndpoint().getEndpoint()))
+        .andRespond(withSoapEnvelope(loadResource("RESPUESTA-DESCARGA.xml")));
+
+    Exception exception = assertThrows(WebServiceClientException.class, () ->
+        serviceTemplate.marshalSendAndReceiveWithProps(props, req)
+    );
+
+    assertThat(exception.getMessage()).isEqualTo(
+        "Could not use transport: No unmarshaller registered. Check configuration of WebServiceTemplate."
+    );
+  }
+
+  /**
+   * Should fail when marshal not present.
+   *
+   * @throws IOException the io exception
+   */
+  @Test
+  public void shouldFailWhenMarshalNotPresent() throws IOException {
     ZonedDateTime now = ZonedDateTime.now();
     ZonedDateTime endDate = now.plusDays(2);
 
