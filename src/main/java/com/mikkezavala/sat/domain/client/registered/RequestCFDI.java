@@ -1,10 +1,14 @@
 package com.mikkezavala.sat.domain.client.registered;
 
 import java.time.ZonedDateTime;
+import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
 @Data
-public class RequestCfdi {
+@Builder
+@Jacksonized
+public class RequestCFDI {
 
   String rfc;
 

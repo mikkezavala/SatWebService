@@ -32,7 +32,7 @@ public class AuthTest extends TestBase {
   @Test
   public void shouldParseAuthResponse() throws Exception {
 
-    File input = loadResource("AUTH.xml");
+    File input = loadResourceAsFile("AUTH.xml");
     FileInputStream fos = new FileInputStream(input);
 
     MessageFactory factory = getMessageFactory();

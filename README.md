@@ -10,9 +10,9 @@
 ## FIEL
 
 En este caso, para protegernos un poco y tener multi-usuarios lo ideal es crear keystores por usuario. Agregue una librería ayuda a crear el PFX.
-Solo necesitas correr `$ ./create-pxf -k FIEL.key -c FIEL.cer -p passwordFiel -r RFC`. Esto creara un archivo `<RFC>.pfx` en `./kestore/<RFC>.pfx`.
+Solo necesitas correr `$ ./create-p12 -k FIEL.key -c FIEL.cer -p passwordFiel -r RFC`. Esto creara un archivo `<RFC>.p12` en `./kestore/<RFC>.p12`.
 
-Por ahora creamos en el file system (proteger) el keystore (.pfx)
+Por ahora creamos en el file system (proteger) el keystore (.p12)
 
 
 ## Base de datos
@@ -20,7 +20,7 @@ Por ahora solo contiene una tabla `sat_client` con `id, rfc, password_plain, kes
 - id: Se auto-genera 
 - rfc: El RFC del cliente que pide sus CFDI
 - password_plain: El password del keystore (creado en el paso de creación de PFX)
-- keystore: El archivo creado por la utilidad `create-pxf` (Por default se guarda como `./kestore/<RFC>.pfx`)
+- keystore: El archivo creado por la utilidad `create-p12` (Por default se guarda como `./kestore/<RFC>.p12`)
 
 ## Iniciando la APP
 Usa docker, te hara la vida sencilla.

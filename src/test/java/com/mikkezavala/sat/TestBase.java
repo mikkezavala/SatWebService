@@ -1,35 +1,27 @@
 package com.mikkezavala.sat;
 
-import static com.mikkezavala.sat.util.Constant.ENVELOPE_NS;
+import static com.mikkezavala.sat.configuration.WebServiceClientConfig.PACKAGES;
 
-import com.mikkezavala.sat.util.XmlUtil;
-import java.io.ByteArrayInputStream;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.SatClient;
+import com.mikkezavala.sat.domain.sat.cfdi.individual.SatToken;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
+import java.time.ZonedDateTime;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPMessage;
+import javax.xml.transform.Result;
 import org.apache.commons.io.IOUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.util.ResourceUtils;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 abstract public class TestBase {
 
@@ -37,21 +29,6 @@ abstract public class TestBase {
 
   protected final String RFC_TEST_PASS = "12345678a";
 
-  protected Map<String, String> getNSContext() {
-    Map<String, String> ns = new HashMap<>();
-    ns.put("s", ENVELOPE_NS);
-    return ns;
-  }
-
-  protected String soapToString(SOAPMessage message) throws Exception {
-    String xml = "";
-    try (OutputStream os = new ByteArrayOutputStream()) {
-      message.writeTo(os);
-      xml = os.toString();
-    }
-
-    return xml;
-  }
 
   protected MessageFactory getMessageFactory() {
     try {
@@ -61,57 +38,19 @@ abstract public class TestBase {
     }
   }
 
-  protected SOAPFactory getSoapFactory() {
-    try {
-      return SOAPFactory.newInstance();
-    } catch (SOAPException e) {
-      throw new RuntimeException("Failed to create SOAPFactory");
-    }
-  }
-
-  protected DocumentBuilderFactory getBuilderFactory() {
-    DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
-    builder.setNamespaceAware(true);
-
-    return builder;
-  }
-
   protected String extractFile(String testResource) {
-    try (InputStream zipFile = new FileInputStream(loadResource(testResource))) {
+    try (InputStream zipFile = new FileInputStream(loadResourceAsFile(testResource))) {
       return Base64.getEncoder().encodeToString(IOUtils.toByteArray(zipFile));
     } catch (IOException e) {
       throw new RuntimeException("Reading ZIP file failed");
     }
   }
 
-  protected SOAPMessage response(String file) {
-    try (InputStream is = new ByteArrayInputStream(
-        new FileInputStream(loadResource(file)).readAllBytes())
-    ) {
-      return getMessageFactory().createMessage(null, is);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to parse");
-    }
+  public Resource loadResource(String resource) {
+    return new ClassPathResource(resource);
   }
 
-  protected <T> SOAPMessage buildMessage(T request) throws Exception {
-
-    SOAPMessage message = getMessageFactory().createMessage();
-    String xml = XmlUtil.serialize(request, true);
-    InputSource source = new InputSource(new StringReader(xml));
-    DocumentBuilder builder = getBuilderFactory().newDocumentBuilder();
-    Document doc = builder.parse(source);
-
-    SOAPBody body = message.getSOAPBody();
-    SOAPElement downloadNode = getSoapFactory().createElement(doc.getDocumentElement());
-
-    body.addChildElement(downloadNode);
-
-    return message;
-
-  }
-
-  public File loadResource(String file) throws FileNotFoundException {
+  public File loadResourceAsFile(String file) throws FileNotFoundException {
     return ResourceUtils.getFile("classpath:" + file);
   }
 
@@ -119,17 +58,42 @@ abstract public class TestBase {
     byte[] buffer = new byte[1024];
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (ZipOutputStream zos = new ZipOutputStream(baos)) {
-        try (FileInputStream fis = new FileInputStream(zipContent)) {
-          zos.putNextEntry(new ZipEntry(zipContent.getName()));
-          int length;
-          while ((length = fis.read(buffer)) > 0) {
-            zos.write(buffer, 0, length);
-          }
-          zos.closeEntry();
+      try (FileInputStream fis = new FileInputStream(zipContent)) {
+        zos.putNextEntry(new ZipEntry(zipContent.getName()));
+        int length;
+        while ((length = fis.read(buffer)) > 0) {
+          zos.write(buffer, 0, length);
         }
+        zos.closeEntry();
+      }
     }
     byte[] bytes = baos.toByteArray();
     return Base64.getEncoder().encodeToString(bytes);
   }
 
+  protected SatToken getMockToken() {
+    ZonedDateTime now = ZonedDateTime.now();
+    return SatToken.builder()
+        .id(99999)
+        .created(now)
+        .rfc(RFC_TEST)
+        .token("ejFake-Token")
+        .expiration(now.plusDays(5)).build();
+  }
+
+  protected SatClient getMockedClient(String keyStorePath) {
+    return new SatClient().id(9999).keystore(keyStorePath).rfc(RFC_TEST)
+        .passwordPlain(RFC_TEST_PASS);
+  }
+
+  protected Jaxb2Marshaller getTestMarshaller() {
+    Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+    marshaller.setPackagesToScan(PACKAGES);
+
+    return marshaller;
+  }
+
+  protected void marshall(Object o, Result result) {
+    getTestMarshaller().marshal(o, result);
+  }
 }

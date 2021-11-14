@@ -53,9 +53,9 @@ openssl pkcs8 -inform der -in $KEY_LOCATION -passin pass:${KEY_PASS} -out key.pe
 echo -e "${CYAN} [PFX BUILDER SH]: Creating CER PEM ${NC}"
 openssl x509 -inform der -in $CERT_LOCATION -out cer.pem
 [ $? -eq 0 ]  || exit 1
-openssl pkcs12 -passout pass:${KEY_PASS} -export -in cer.pem -inkey key.pem -out ./keystore/${RFC}.pfx
+openssl pkcs12 -passout pass:${KEY_PASS} -export -in cer.pem -inkey key.pem -out ./keystore/${RFC}.p12 -name "${RFC}"
 [ $? -eq 0 ]  || exit 1
 echo -e "${CYAN} [PFX BUILDER SH]: Removing intermediates ${NC}"
 rm key.pem && rm cer.pem
 [ $? -eq 0 ]  || exit 1
-echo -e "${GREEN} [PFX BUILDER SH]: PFX created at: \"./keystore/${RFC}.pfx${NC}\""
+echo -e "${GREEN} [PFX BUILDER SH]: PFX created at: \"./keystore/${RFC}.p12${NC}\" -alias ${RFC}"

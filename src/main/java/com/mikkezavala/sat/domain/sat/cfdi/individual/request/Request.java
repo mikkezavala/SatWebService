@@ -33,5 +33,4 @@ public class Request {
 
   @XmlAttribute(name = "TipoSolicitud")
   private String requestType;
-
 }

@@ -1,5 +1,6 @@
 .idea
 **/**/resources/*.pfx
+**/**/resources/*.p12
 .*githookrc
 soap
 target
