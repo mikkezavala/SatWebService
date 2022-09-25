@@ -1,4 +1,4 @@
-FROM amazoncorretto:17-alpine
+FROM amazoncorretto:19-alpine
 
 RUN apk upgrade --update-cache --available && apk add openssl && rm -rf /var/cache/apk/*
 
